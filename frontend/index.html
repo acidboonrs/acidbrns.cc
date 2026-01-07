@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMPP Account Registrierung - acidbrns.cc</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>XMPP Account erstellen</h1>
+            <p class="subtitle">Registriere deinen Account bei acidbrns.cc</p>
+        </header>
+
+        <main>
+            <div id="alertBox" class="alert" style="display: none;"></div>
+
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="username">Benutzername</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            required
+                            pattern="[a-zA-Z0-9_-]{3,32}"
+                            placeholder="benutzername"
+                            autocomplete="off"
+                        >
+                        <span class="domain-suffix">@acidbrns.cc</span>
+                    </div>
+                    <small class="help-text">3-32 Zeichen, nur Buchstaben, Zahlen, - und _</small>
+                    <div id="usernameCheck" class="validation-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-Mail-Adresse</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        placeholder="deine@email.de"
+                        autocomplete="email"
+                    >
+                    <small class="help-text">Für Account-Wiederherstellung (optional zukünftig)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Passwort</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        minlength="8"
+                        placeholder="Mindestens 8 Zeichen"
+                        autocomplete="new-password"
+                    >
+                    <small class="help-text">Mindestens 8 Zeichen, mit Buchstaben und Zahlen</small>
+                    <div id="passwordStrength" class="password-strength"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordConfirm">Passwort wiederholen</label>
+                    <input
+                        type="password"
+                        id="passwordConfirm"
+                        name="passwordConfirm"
+                        required
+                        minlength="8"
+                        placeholder="Passwort bestätigen"
+                        autocomplete="new-password"
+                    >
+                    <div id="passwordMatch" class="validation-message"></div>
+                </div>
+
+                <button type="submit" id="submitButton" class="submit-button">
+                    Account erstellen
+                </button>
+            </form>
+
+            <div id="successMessage" class="success-box" style="display: none;">
+                <h2>✓ Account erfolgreich erstellt!</h2>
+                <p>Deine Jabber-ID (JID):</p>
+                <div class="jid-display" id="jidDisplay"></div>
+                <div class="client-info">
+                    <h3>Wie geht es weiter?</h3>
+                    <p>Lade einen XMPP-Client herunter und melde dich mit deiner JID und deinem Passwort an:</p>
+                    <ul class="client-list">
+                        <li><strong>Desktop:</strong> <a href="https://gajim.org/" target="_blank">Gajim</a>, <a href="https://dino.im/" target="_blank">Dino</a></li>
+                        <li><strong>Android:</strong> <a href="https://conversations.im/" target="_blank">Conversations</a></li>
+                        <li><strong>iOS:</strong> <a href="https://siskin.im/" target="_blank">Siskin</a>, <a href="https://monal-im.org/" target="_blank">Monal</a></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="info-section">
+                <h3>Was ist XMPP?</h3>
+                <p>XMPP (Jabber) ist ein offenes, dezentrales Protokoll für Instant Messaging.
+                   Im Gegensatz zu WhatsApp oder Telegram ist XMPP nicht von einem einzelnen
+                   Anbieter abhängig und bietet mehr Privatsphäre und Kontrolle.</p>
+            </div>
+            <div class="links">
+                <a href="https://xmpp.org/" target="_blank">Mehr über XMPP</a>
+                <span class="separator">|</span>
+                <a href="https://acidbrns.cc" target="_blank">acidbrns.cc</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

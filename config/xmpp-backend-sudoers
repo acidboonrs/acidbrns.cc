@@ -1,0 +1,6 @@
+# Sudoers configuration for XMPP registration backend
+# Place this file in: /etc/sudoers.d/xmpp-backend
+# Set permissions with: sudo chmod 0440 /etc/sudoers.d/xmpp-backend
+
+# Allow www-data to run the Prosody permission fix script without password
+www-data ALL=(ALL) NOPASSWD: /usr/local/bin/fix-prosody-perms.sh

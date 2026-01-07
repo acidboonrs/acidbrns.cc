@@ -1,0 +1,35 @@
+[Unit]
+Description=XMPP Registration Backend (Gunicorn)
+After=network.target postgresql.service prosody.service
+Wants=postgresql.service prosody.service
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/xmpp-registration/backend
+Environment="PATH=/var/www/xmpp-registration/backend/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/var/www/xmpp-registration/backend/venv/bin/gunicorn \
+    --workers 4 \
+    --bind 127.0.0.1:5000 \
+    --timeout 30 \
+    --access-logfile /var/log/xmpp-backend/access.log \
+    --error-logfile /var/log/xmpp-backend/error.log \
+    --log-level info \
+    app:app
+
+# Security settings
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/xmpp-backend /var/lib/prosody
+
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+StartLimitInterval=60s
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target
