@@ -115,6 +115,34 @@ def create_prosody_account(username, password):
         app.logger.error(f"Exception creating Prosody account: {str(e)}")
         return False, f"Fehler bei Account-Erstellung: {str(e)}"
 
+def delete_prosody_account(username):
+    """Delete account from Prosody XMPP server (rollback)"""
+    try:
+        jid = f"{username}@{XMPP_DOMAIN}"
+
+        # Call prosodyctl to delete the account
+        process = subprocess.run(
+            [PROSODY_PATH, 'deluser', jid],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=10
+        )
+
+        if process.returncode == 0:
+            app.logger.info(f"Successfully rolled back Prosody account: {jid}")
+            return True, "Account gelöscht"
+        else:
+            error_msg = process.stderr.decode('utf-8', errors='ignore') if process.stderr else "Unbekannter Fehler"
+            app.logger.error(f"Prosody delete error: {error_msg}")
+            return False, f"Prosody Löschfehler: {error_msg}"
+
+    except subprocess.TimeoutExpired:
+        app.logger.error(f"Prosodyctl delete timeout for {username}")
+        return False, "Timeout bei Account-Löschung"
+    except Exception as e:
+        app.logger.error(f"Exception deleting Prosody account: {str(e)}")
+        return False, f"Fehler bei Account-Löschung: {str(e)}"
+
 def create_database_account(username, email, password):
     """Create account record in PostgreSQL database"""
     try:
@@ -223,7 +251,10 @@ def register():
         success, result = create_database_account(username, email, password)
         if not success:
             app.logger.error(f"Failed to create database record for {username}: {result}")
-            # TODO: Consider rolling back Prosody account creation
+            # Rollback Prosody account creation
+            rollback_success, rollback_msg = delete_prosody_account(username)
+            if not rollback_success:
+                app.logger.error(f"Failed to rollback Prosody account for {username}: {rollback_msg}")
             return jsonify({'error': f'Datenbank-Eintrag konnte nicht erstellt werden: {result}'}), 500
 
         jid = f"{username}@{XMPP_DOMAIN}"
