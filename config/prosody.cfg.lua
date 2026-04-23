@@ -38,13 +38,10 @@ modules_enabled = {
     -- HTTP modules
     "bosh";             -- Enable BOSH clients
     "websocket";        -- Enable WebSocket support
-    "http_files";       -- Serve static files from a directory
 
     -- Other modules
     "posix";            -- POSIX functionality
     "announce";         -- Send announcement to all online users
-    "watchregistrations"; -- Alert admins of registrations
-    "legacyauth";       -- Legacy authentication (XEP-0078)
 }
 
 -- Modules to disable
