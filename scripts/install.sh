@@ -66,6 +66,7 @@ apt-get install -y \
     certbot \
     python3-certbot-nginx \
     prosody \
+    prosody-modules \
     lua5.4 \
     git \
     curl
