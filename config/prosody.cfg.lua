@@ -5,7 +5,7 @@
 admins = { }
 
 -- Plugin paths
-plugin_paths = { "/usr/lib/prosody/modules" }
+plugin_paths = { "/usr/lib/prosody/modules", "/usr/share/prosody-modules" }
 
 -- Modules to load
 modules_enabled = {
@@ -17,6 +17,7 @@ modules_enabled = {
     "disco";            -- Service discovery
     "carbons";          -- Keep multiple clients in sync
     "pep";              -- Enables users to publish their avatar, mood, activity, etc.
+    "omemo_all_access"; -- Make OMEMO device list nodes publicly accessible (XEP-0384)
     "private";          -- Private XML storage (for room bookmarks, etc.)
     "blocklist";        -- Allow users to block communications with other users
     "vcard4";           -- User profiles (stored in PEP)
