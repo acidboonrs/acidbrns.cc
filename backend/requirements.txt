@@ -1,0 +1,20 @@
+# Python Dependencies für XMPP Registration Backend
+
+# Web Framework
+Flask==3.0.0
+flask-cors==4.0.0
+
+# Datenbank
+psycopg2-binary==2.9.9
+
+# Sicherheit & Hashing
+bcrypt==4.1.2
+
+# Umgebungsvariablen
+python-dotenv==1.0.0
+
+# Optional: Production Server (statt Flask dev server)
+gunicorn==21.2.0
+
+# Optional: Für Email-Versand (Email-Verifikation)
+# flask-mail==0.9.1

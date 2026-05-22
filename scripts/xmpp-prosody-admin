@@ -1,0 +1,23 @@
+#!/bin/bash
+# Validated wrapper for prosodyctl account operations.
+# Invoked as: sudo -u prosody /usr/local/sbin/xmpp-prosody-admin <action> <username>
+# Domain + prosodyctl path are fixed here so a caller cannot influence them.
+# Passwords (register/passwd) are passed through stdin, never as arguments.
+#
+# Install to /usr/local/sbin/xmpp-prosody-admin (root:root, 0755) and grant the
+# web user a single tightly-scoped sudo rule (see scripts/sudoers-xmpp-registration).
+set -euo pipefail
+DOMAIN="acidbrns.cc"
+PROSODYCTL="/usr/bin/prosodyctl"
+action="${1:-}"
+user="${2:-}"
+if ! [[ "$user" =~ ^[a-z0-9_-]{3,32}$ ]]; then
+    echo "xmpp-prosody-admin: invalid username" >&2
+    exit 64
+fi
+case "$action" in
+    register) exec "$PROSODYCTL" register "$user" "$DOMAIN" ;;
+    passwd)   exec "$PROSODYCTL" passwd  "${user}@${DOMAIN}" ;;
+    deluser)  exec "$PROSODYCTL" deluser "${user}@${DOMAIN}" ;;
+    *) echo "xmpp-prosody-admin: invalid action" >&2; exit 64 ;;
+esac

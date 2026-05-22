@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Account erstellen — Onion</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧅 Account erstellen</h1>
+            <p class="subtitle">JavaScript-freie Registrierung über Tor</p>
+        </header>
+
+        <main>
+            {% if errors %}
+            <div class="message-box error">
+                <strong>Fehler:</strong>
+                <ul>{% for err in errors %}<li>{{ err }}</li>{% endfor %}</ul>
+            </div>
+            {% endif %}
+
+            <section class="form-section">
+                <form method="POST" action="/api/onion/register" autocomplete="off">
+                    <!-- Honeypot: muss leer bleiben (versteckt via .hp-field in style.css) -->
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="website">Website (nicht ausfüllen):</label>
+                        <input type="text" id="website" name="website"
+                               tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username"><span class="icon">👤</span> Benutzername</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="username" name="username"
+                                   value="{{ username }}"
+                                   placeholder="dein-name"
+                                   required minlength="3" maxlength="32"
+                                   pattern="[a-z0-9_-]+" autocomplete="off">
+                            <span class="domain-suffix">@acidbrns.cc</span>
+                        </div>
+                        <small class="help-text">3–32 Zeichen: Kleinbuchstaben, Zahlen, - und _</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="icon">📧</span> E-Mail <span class="optional">(optional)</span>
+                        </label>
+                        <input type="email" id="email" name="email"
+                               value="{{ email }}"
+                               placeholder="optional@example.org"
+                               maxlength="254" autocomplete="off">
+                        <small class="help-text">
+                            Nur für Account-Wiederherstellung. Kann leer bleiben — auf Tor empfohlen.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password"><span class="icon">🔒</span> Passwort</label>
+                        <input type="password" id="password" name="password"
+                               placeholder="Sicheres Passwort"
+                               required minlength="12" maxlength="128"
+                               autocomplete="new-password">
+                        <small class="help-text">
+                            Mindestens 12 Zeichen mit Groß-, Kleinbuchstaben, Zahlen und Sonderzeichen
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2"><span class="icon">🔒</span> Passwort wiederholen</label>
+                        <input type="password" id="password2" name="password2"
+                               placeholder="Passwort bestätigen"
+                               required minlength="12" maxlength="128"
+                               autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="math_answer"><span class="icon">🧮</span> Bot-Schutz: {{ math_question }} = ?</label>
+                        <input type="text" id="math_answer" name="math_answer" required
+                               inputmode="numeric" pattern="[0-9]+" autocomplete="off"
+                               class="input-narrow">
+                        <input type="hidden" name="math_token" value="{{ math_token }}">
+                        <small class="help-text">Bitte die Summe eintragen — JS-frei statt Cloudflare</small>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" name="privacy" required>
+                            Ich akzeptiere die <a href="/datenschutz.html">Datenschutzerklärung</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Account erstellen 🚀</button>
+                </form>
+            </section>
+
+            <p class="back-link"><a href="/">← Startseite</a></p>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 acidbrns.cc |
+                <a href="/datenschutz.html">Datenschutz</a> |
+                <a href="/onion.html">🧅 Onion-Statement</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

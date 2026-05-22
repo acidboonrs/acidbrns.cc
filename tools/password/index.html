@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Password Generator – sichere Passwörter lokal im Browser generieren">
+    <meta name="theme-color" content="#00ff88">
+    <title>Password Generator – tools.acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #09090b; --bg-secondary: #0f0f12; --bg-card: #131316; --text-primary: #fafafa; --text-secondary: #71717a; --text-muted: #52525b; --accent: #00ff88; --accent-glow: rgba(0,255,136,0.15); --border: #27272a; --red: #ff4444; --red-glow: rgba(255,68,68,0.1); --yellow: #ffcc00; --orange: #ff8800; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 700px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .page-header { margin-bottom: 2rem; }
+        .page-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .page-desc { color: var(--text-secondary); font-size: 0.9375rem; }
+        .password-display { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+        .password-text { font-family: 'JetBrains Mono', monospace; font-size: 1.125rem; color: var(--accent); flex: 1; word-break: break-all; min-height: 1.5em; }
+        .icon-btn { padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; }
+        .icon-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .icon-btn svg { width: 18px; height: 18px; }
+        .strength-bar-wrap { margin-bottom: 1.5rem; }
+        .strength-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.375rem; }
+        .strength-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+        .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
+        .options { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .option-row { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+        .option-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .option-row:first-child { padding-top: 0; }
+        .option-label { font-size: 0.9375rem; color: var(--text-primary); }
+        .option-sub { font-size: 0.8125rem; color: var(--text-muted); }
+        .toggle { position: relative; width: 44px; height: 24px; cursor: pointer; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 12px; transition: background 0.2s; }
+        .toggle input:checked + .toggle-track { background: var(--accent); }
+        .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: var(--bg-primary); border-radius: 50%; transition: transform 0.2s; }
+        .toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+        .length-row { display: flex; align-items: center; gap: 1rem; }
+        .length-slider { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--border); outline: none; cursor: pointer; }
+        .length-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+        .length-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--accent); min-width: 2.5em; text-align: right; }
+        .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .btn-primary { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); font-size: 1rem; }
+        .btn-primary:hover { background: rgba(0,255,136,0.25); }
+        .history { margin-top: 2rem; }
+        .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; display: block; }
+        .history-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .history-item { display: flex; align-items: center; gap: 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; }
+        .history-pw { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; flex: 1; color: var(--text-secondary); word-break: break-all; }
+        .status { padding: 0.5rem 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; display: none; margin-bottom: 1rem; }
+        .status.ok { background: var(--accent-glow); border: 1px solid rgba(0,255,136,0.2); color: var(--accent); display: block; }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 640px) { .footer-content { flex-direction: column; gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="https://tools.acidbrns.cc" class="back-link" title="Zurück zu Tools">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                </a>
+                <a href="https://tools.acidbrns.cc" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>tools<span class="logo-divider">/</span>password</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Password Generator</h1>
+                <p class="page-desc">Kryptografisch sichere Passwörter mit <code style="font-family:JetBrains Mono,monospace;color:var(--accent)">crypto.getRandomValues()</code> generieren. Kein Netzwerkzugriff.</p>
+            </div>
+
+            <div id="status" class="status"></div>
+
+            <div class="password-display">
+                <span class="password-text" id="passwordText">–</span>
+                <button class="icon-btn" onclick="copyPassword()" title="Kopieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" /></svg>
+                </button>
+                <button class="icon-btn" onclick="generate()" title="Neu generieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                </button>
+            </div>
+
+            <div class="strength-bar-wrap">
+                <div class="strength-label">
+                    <span>Stärke</span>
+                    <span id="strengthText">–</span>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            </div>
+
+            <div class="options">
+                <div class="option-row">
+                    <div>
+                        <div class="option-label">Länge</div>
+                    </div>
+                    <div class="length-row">
+                        <input type="range" class="length-slider" id="lengthSlider" min="8" max="128" value="24" oninput="updateLength()">
+                        <span class="length-value" id="lengthValue">24</span>
+                    </div>
+                </div>
+                <div class="option-row">
+                    <div>
+                        <div class="option-label">Großbuchstaben</div>
+                        <div class="option-sub">A–Z</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="optUpper" checked onchange="generate()">
+                        <div class="toggle-track"></div>
+                        <div class="toggle-thumb"></div>
+                    </label>
+                </div>
+                <div class="option-row">
+                    <div>
+                        <div class="option-label">Kleinbuchstaben</div>
+                        <div class="option-sub">a–z</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="optLower" checked onchange="generate()">
+                        <div class="toggle-track"></div>
+                        <div class="toggle-thumb"></div>
+                    </label>
+                </div>
+                <div class="option-row">
+                    <div>
+                        <div class="option-label">Zahlen</div>
+                        <div class="option-sub">0–9</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="optNumbers" checked onchange="generate()">
+                        <div class="toggle-track"></div>
+                        <div class="toggle-thumb"></div>
+                    </label>
+                </div>
+                <div class="option-row">
+                    <div>
+                        <div class="option-label">Sonderzeichen</div>
+                        <div class="option-sub">!@#$%^&*()-_=+[]{}|;:,.<>?</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="optSymbols" checked onchange="generate()">
+                        <div class="toggle-track"></div>
+                        <div class="toggle-thumb"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="generate()">↻ Neu generieren</button>
+                <button class="btn" onclick="generateMultiple()">5× generieren</button>
+            </div>
+
+            <div class="history" id="historySection" style="display:none">
+                <span class="section-label">Verlauf (diese Sitzung)</span>
+                <div class="history-list" id="historyList"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© 2026 acidbrns.cc</p>
+                <div class="footer-links"><a href="https://tools.acidbrns.cc">Alle Tools</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
+        const history = [];
+
+        function updateLength() {
+            const val = document.getElementById('lengthSlider').value;
+            document.getElementById('lengthValue').textContent = val;
+            generate();
+        }
+
+        function getCharset() {
+            let charset = '';
+            if (document.getElementById('optUpper').checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (document.getElementById('optLower').checked) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (document.getElementById('optNumbers').checked) charset += '0123456789';
+            if (document.getElementById('optSymbols').checked) charset += '!@#$%^&*()-_=+[]{}|;:,.<>?';
+            return charset;
+        }
+
+        function generate() {
+            const charset = getCharset();
+            if (!charset) {
+                document.getElementById('passwordText').textContent = 'Mindestens eine Option wählen';
+                return;
+            }
+            const length = parseInt(document.getElementById('lengthSlider').value);
+            const array = new Uint32Array(length);
+            crypto.getRandomValues(array);
+            const password = Array.from(array).map(n => charset[n % charset.length]).join('');
+            document.getElementById('passwordText').textContent = password;
+            updateStrength(password, charset);
+            addToHistory(password);
+        }
+
+        function updateStrength(password, charset) {
+            const entropy = password.length * Math.log2(charset.length);
+            let label, color, width;
+            if (entropy < 40) { label = 'Schwach'; color = '#ff4444'; width = '20%'; }
+            else if (entropy < 60) { label = 'Mäßig'; color = '#ff8800'; width = '40%'; }
+            else if (entropy < 80) { label = 'Gut'; color = '#ffcc00'; width = '65%'; }
+            else if (entropy < 100) { label = 'Stark'; color = '#00cc66'; width = '85%'; }
+            else { label = 'Sehr stark'; color = '#00ff88'; width = '100%'; }
+            document.getElementById('strengthText').textContent = label + ' (' + Math.round(entropy) + ' bit Entropie)';
+            const fill = document.getElementById('strengthFill');
+            fill.style.width = width;
+            fill.style.background = color;
+        }
+
+        function addToHistory(pw) {
+            history.unshift(pw);
+            if (history.length > 10) history.pop();
+            const list = document.getElementById('historyList');
+            const section = document.getElementById('historySection');
+            section.style.display = 'block';
+            list.innerHTML = history.map(p => `
+                <div class="history-item">
+                    <span class="history-pw">${p}</span>
+                    <button class="icon-btn" onclick="navigator.clipboard.writeText('${p.replace(/'/g,"\\'")}').then(()=>showStatus('Kopiert!','ok'))" title="Kopieren">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" /></svg>
+                    </button>
+                </div>`).join('');
+        }
+
+        function generateMultiple() {
+            for (let i = 0; i < 5; i++) generate();
+        }
+
+        function copyPassword() {
+            const pw = document.getElementById('passwordText').textContent;
+            if (pw === '–' || pw.startsWith('Mindestens')) return;
+            navigator.clipboard.writeText(pw).then(() => showStatus('Passwort kopiert!', 'ok'));
+        }
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = 'status ' + type;
+            setTimeout(() => { el.className = 'status'; }, 2000);
+        }
+
+        generate();
+    </script>
+</body>
+</html>

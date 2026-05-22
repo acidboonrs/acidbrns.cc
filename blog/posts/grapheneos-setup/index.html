@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wie ich mein Pixel 9 mit GrapheneOS eingerichtet habe und welche Apps ich für maximale Privatsphäre nutze.">
+    <title>GrapheneOS auf dem Pixel 9 – Mein Setup – acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #0f0f12;
+            --bg-card: #131316;
+            --text-primary: #fafafa;
+            --text-secondary: #71717a;
+            --text-muted: #52525b;
+            --accent: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.15);
+            --border: #27272a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 720px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; justify-content: space-between; }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .post-header { margin-bottom: 2.5rem; }
+        .post-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .post-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 500; color: var(--accent); background: var(--accent-glow); padding: 0.25rem 0.5rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .post-title { font-size: 2rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.75rem; }
+        .post-desc { color: var(--text-secondary); font-size: 1.0625rem; }
+        .post-content { font-size: 1rem; line-height: 1.8; color: var(--text-secondary); }
+        .post-content h2 { color: var(--text-primary); font-size: 1.375rem; margin: 2.5rem 0 1rem; }
+        .post-content h3 { color: var(--text-primary); font-size: 1.125rem; margin: 2rem 0 0.75rem; }
+        .post-content p { margin-bottom: 1.25rem; }
+        .post-content ul, .post-content ol { margin: 0 0 1.25rem 1.5rem; }
+        .post-content li { margin-bottom: 0.5rem; }
+        .post-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; background: var(--bg-card); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--accent); }
+        .post-content pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; overflow-x: auto; }
+        .post-content pre code { background: none; border: none; padding: 0; font-size: 0.8125rem; color: var(--text-primary); }
+        .post-content strong { color: var(--text-primary); }
+        .post-content a { color: var(--accent); text-decoration: none; }
+        .post-content a:hover { text-decoration: underline; }
+        .post-content blockquote { border-left: 3px solid var(--accent); padding: 0.75rem 1.25rem; margin: 1.25rem 0; background: var(--accent-glow); border-radius: 0 8px 8px 0; }
+        .post-content blockquote p { margin-bottom: 0; color: var(--text-primary); }
+        .post-nav { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .post-nav a { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+        .post-nav a:hover { text-decoration: underline; }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links { display: flex; gap: 1rem; }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 640px) { .post-title { font-size: 1.5rem; } .header-content { flex-direction: column; align-items: flex-start; } .footer-content { flex-direction: column; gap: 1rem; text-align: center; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/" class="back-link" title="Zurück zum Blog">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                    </a>
+                    <a href="/" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>blog</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <div class="post-header">
+                <div class="post-meta">
+                    <span class="post-date">2026-01-28</span>
+                    <span class="post-tag">Security</span>
+                </div>
+                <h1 class="post-title">GrapheneOS auf dem Pixel 9 – Mein Setup</h1>
+                <p class="post-desc">Wie ich mein Pixel 9 mit GrapheneOS eingerichtet habe und welche Apps ich für maximale Privatsphäre nutze.</p>
+            </div>
+            <div class="post-content">
+
+                <p>Wer mich kennt, weiß: Ich vertraue keinem Betriebssystem, das ich nicht selbst installiert habe. Stock Android auf einem Pixel ist zwar besser als die meisten Hersteller-ROMs, aber Google bleibt Google. Deshalb läuft auf meinem Pixel 9 seit ein paar Wochen <strong>GrapheneOS</strong> – und ich bin ehrlich begeistert. In diesem Post zeige ich euch, wie die Installation ablief, welche Apps ich nutze und welche Härtungsmaßnahmen ich empfehle.</p>
+
+                <h2>Warum GrapheneOS und nicht Stock Android?</h2>
+
+                <p>GrapheneOS ist ein gehärtetes, auf Privatsphäre ausgelegtes Android-Betriebssystem, das ausschließlich auf Google Pixel-Geräten läuft. Der Grund dafür ist einfach: Pixel-Phones bieten <strong>verifiziertes Booten</strong> (Verified Boot) auch mit einem alternativen Betriebssystem, was bei den meisten anderen Herstellern nicht der Fall ist. Das bedeutet, dass der Bootloader nach der Installation von GrapheneOS wieder gesperrt werden kann, ohne die Sicherheit zu kompromittieren.</p>
+
+                <p>Im Vergleich zu Stock Android bietet GrapheneOS unter anderem:</p>
+                <ul>
+                    <li><strong>Gehärtete Memory Allocation</strong> – hardened_malloc ersetzt den Standard-Allocator und macht Speicher-Exploits deutlich schwieriger</li>
+                    <li><strong>Netzwerk- und Sensor-Berechtigungen</strong> – Apps können granular vom Netzwerk oder von Sensoren abgeschnitten werden</li>
+                    <li><strong>Sandboxed Google Play</strong> – Google-Dienste laufen in einer normalen Sandbox, ohne Systemrechte</li>
+                    <li><strong>Separate Nutzerprofile</strong> – echte Isolation zwischen Arbeits-, Privat- und Wegwerf-Profilen</li>
+                    <li><strong>Automatische Neustart-Funktion</strong> – das Gerät kann nach einer konfigurierbaren Inaktivitätszeit automatisch neustarten, um Encryption-Keys aus dem RAM zu löschen</li>
+                </ul>
+
+                <blockquote><p>GrapheneOS entfernt nicht einfach Google-Dienste – es macht sie optional und entfernt ihnen die Sonderrechte. Das ist ein fundamentaler Unterschied zu anderen Custom ROMs.</p></blockquote>
+
+                <h2>Installation auf dem Pixel 9</h2>
+
+                <p>Die Installation von GrapheneOS ist mittlerweile überraschend einfach. Das Projekt bietet einen <strong>Web-Installer</strong> an, der direkt im Browser (Chromium-basiert, da WebUSB benötigt wird) funktioniert. Hier die groben Schritte:</p>
+
+                <ol>
+                    <li>OEM-Entsperrung in den Entwickleroptionen aktivieren</li>
+                    <li>Das Gerät im Bootloader-Modus starten (<code>adb reboot bootloader</code> oder Power + Volume Down)</li>
+                    <li>Den <a href="https://grapheneos.org/install/web">Web-Installer</a> öffnen und den Anweisungen folgen</li>
+                    <li>Nach dem Flashen den Bootloader wieder sperren</li>
+                </ol>
+
+                <p>Der gesamte Vorgang hat bei mir etwa 15 Minuten gedauert. Falls ihr den Web-Installer nicht nutzen wollt, gibt es auch die CLI-Variante:</p>
+
+                <pre><code># Bootloader entsperren
+fastboot flashing unlock
+
+# GrapheneOS flashen (aus dem entpackten Verzeichnis)
+./flash-all.sh
+
+# Bootloader wieder sperren – wichtig!
+fastboot flashing lock</code></pre>
+
+                <blockquote><p>Den Bootloader nach der Installation unbedingt wieder sperren. Nur so ist Verified Boot aktiv und schützt vor Manipulationen am System.</p></blockquote>
+
+                <h2>Meine App-Auswahl</h2>
+
+                <p>GrapheneOS kommt bewusst ohne App Store. Ich nutze eine Kombination aus <strong>F-Droid</strong>, <strong>Obtainium</strong> und dem sandboxed Google Play Store:</p>
+
+                <h3>Kommunikation</h3>
+                <ul>
+                    <li><strong>Signal</strong> – Mein Standard-Messenger für die meisten Kontakte. Ende-zu-Ende-verschlüsselt, minimale Metadaten dank Sealed Sender. Ich installiere Signal direkt über die offizielle APK oder den Play Store in der Sandbox.</li>
+                    <li><strong>Conversations</strong> – Mein XMPP-Client der Wahl auf Android. Unterstützt OMEMO-Verschlüsselung, läuft stabil und hat einen geringen Ressourcenverbrauch. Perfekt für die Kommunikation über meinen eigenen XMPP-Server.</li>
+                </ul>
+
+                <h3>Netzwerk und Privatsphäre</h3>
+                <ul>
+                    <li><strong>Mullvad VPN</strong> – Kein Account nötig, Zahlung mit Bargeld oder Krypto möglich. Mullvad ist für mich der vertrauenswürdigste VPN-Anbieter, weil das Geschäftsmodell transparent ist und sie regelmäßig auditiert werden.</li>
+                    <li><strong>Mullvad Browser</strong> – Basiert auf dem Tor Browser, aber ohne Tor-Netzwerk. Starkes Fingerprinting-Schutz-Profil.</li>
+                    <li><strong>Vanadium</strong> – Der Standard-Browser von GrapheneOS, ein gehärteter Chromium-Fork. Für alltägliches Browsen meine erste Wahl.</li>
+                </ul>
+
+                <h3>App-Updates ohne Google</h3>
+                <ul>
+                    <li><strong>Obtainium</strong> – Das ist ein Gamechanger. Obtainium holt Updates direkt von GitHub Releases, GitLab, F-Droid-Repos oder APK-Quellen. Kein zentraler Store nötig, trotzdem automatische Update-Benachrichtigungen. Ich nutze Obtainium für Signal, Mullvad, Conversations und diverse andere Apps.</li>
+                </ul>
+
+                <h3>Sandboxed Google Play</h3>
+                <p>Für die wenigen Apps, die zwingend Google Play Services brauchen (z.B. manche Banking-Apps), habe ich den <strong>Sandboxed Google Play Store</strong> in einem separaten Nutzerprofil installiert. Die Einrichtung ist simpel:</p>
+
+                <pre><code># In GrapheneOS unter:
+# Einstellungen → Apps → Sandboxed Google Play installieren
+# Dann den Play Store wie gewohnt nutzen –
+# aber ohne Systemrechte für Google.</code></pre>
+
+                <p>Der entscheidende Punkt: Google Play Services laufen hier als <strong>normale App</strong> in der Sandbox, nicht als privilegierter Systemdienst. Sie haben keinerlei Sonderzugriff auf das System. Das ist ein massiver Sicherheitsgewinn gegenüber jedem anderen Android-ROM.</p>
+
+                <h2>Härtungsmaßnahmen</h2>
+
+                <p>Nach der Installation und App-Einrichtung geht es ans Feintuning. Hier sind meine wichtigsten Empfehlungen:</p>
+
+                <h3>Netzwerk-Berechtigungen einschränken</h3>
+                <p>GrapheneOS bietet eine einzigartige Funktion: die <strong>Network Permission</strong> pro App. Unter <code>Einstellungen → Apps → [App] → Berechtigungen</code> kann man jeder App den Netzwerkzugriff komplett entziehen. Das nutze ich für alle Offline-Tools wie Taschenrechner, Dateimanager und Notiz-Apps. Eine App, die keinen Netzwerkzugriff hat, kann auch keine Daten exfiltrieren.</p>
+
+                <h3>Sensoren-Zugriff deaktivieren</h3>
+                <p>Unter den Entwickleroptionen gibt es den <strong>Sensors Off</strong>-Toggle. Damit werden Gyroskop, Beschleunigungssensor und Magnetometer für alle Apps deaktiviert. GrapheneOS geht hier noch weiter und bietet eine <strong>pro-App Sensors Permission</strong>, mit der man den Sensor-Zugriff gezielt steuern kann. Sensoren können für Fingerprinting und Tracking missbraucht werden – also abschalten, wo nicht nötig.</p>
+
+                <h3>Separate Profile nutzen</h3>
+                <p>Ich arbeite mit <strong>drei Nutzerprofilen</strong>:</p>
+                <ul>
+                    <li><strong>Owner-Profil</strong> – Minimal gehalten. Nur die wichtigsten Apps: Signal, Conversations, Mullvad VPN, Vanadium. Kein Google Play.</li>
+                    <li><strong>Arbeitsprofil</strong> – Hier läuft der Sandboxed Play Store für die wenigen unvermeidbaren Google-abhängigen Apps. Dieses Profil wird nach Nutzung sofort wieder deaktiviert.</li>
+                    <li><strong>Wegwerf-Profil</strong> – Für Apps, denen ich nicht vertraue, die ich aber kurz testen möchte. Kann jederzeit komplett gelöscht und neu erstellt werden.</li>
+                </ul>
+
+                <p>Jedes Profil hat einen eigenen Verschlüsselungsschlüssel. Wenn ein Profil gesperrt ist, sind die Daten darin verschlüsselt und für andere Profile nicht zugänglich.</p>
+
+                <h3>Weitere Einstellungen</h3>
+                <ul>
+                    <li><strong>Auto-Reboot</strong> auf 18 Stunden setzen – löscht Encryption-Keys aus dem RAM bei Inaktivität</li>
+                    <li><strong>USB-C-Zugriff</strong> deaktivieren, wenn das Gerät gesperrt ist (<code>Einstellungen → Sicherheit → USB-Zubehör</code>)</li>
+                    <li><strong>PIN-Scrambling</strong> aktivieren – die Ziffernanordnung auf dem Sperrbildschirm wird zufällig gemischt, was Shoulder-Surfing erschwert</li>
+                    <li><strong>Exploit Protection</strong>-Einstellungen überprüfen – Memory Tagging (MTE) auf dem Pixel 9 aktivieren, sofern verfügbar</li>
+                </ul>
+
+                <h2>Fazit</h2>
+
+                <p>GrapheneOS auf dem Pixel 9 ist für mich derzeit das beste Setup, wenn man <strong>Sicherheit und Alltagstauglichkeit</strong> verbinden möchte. Die Installation ist unkompliziert, die App-Kompatibilität dank Sandboxed Google Play hervorragend, und die zusätzlichen Härtungsmaßnahmen gehen weit über das hinaus, was Stock Android bietet.</p>
+
+                <p>Ja, es erfordert etwas Einarbeitung. Und ja, man muss sich bewusst entscheiden, welche Kompromisse man eingeht. Aber genau das ist der Punkt: Bei GrapheneOS habe <strong>ich</strong> die Kontrolle, nicht Google. Und das ist mir ein Pixel 9 wert.</p>
+
+                <p>Bei Fragen zu meinem Setup oder zur Installation erreicht ihr mich wie immer per <a href="xmpp:acid@acidbrns.cc">XMPP</a> oder <a href="https://acidbrns.cc">über meine Hauptseite</a>.</p>
+
+            </div>
+            <div class="post-nav">
+                <a href="/">← Zurück zum Blog</a>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© 2026 acidbrns.cc</p>
+                <div class="footer-links">
+                    <a href="https://acidbrns.cc">Hauptseite</a>
+                    <a href="/">Blog</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script></script>
+</body>
+</html>

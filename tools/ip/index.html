@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IP Info – öffentliche IP und Standortinformationen anzeigen">
+    <meta name="theme-color" content="#00ff88">
+    <title>IP Info – tools.acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #09090b; --bg-secondary: #0f0f12; --bg-card: #131316; --text-primary: #fafafa; --text-secondary: #71717a; --text-muted: #52525b; --accent: #00ff88; --accent-glow: rgba(0,255,136,0.15); --border: #27272a; --red: #ff4444; --red-glow: rgba(255,68,68,0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 700px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .page-header { margin-bottom: 2rem; }
+        .page-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .page-desc { color: var(--text-secondary); font-size: 0.9375rem; }
+        .ip-hero { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 2rem; }
+        .ip-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+        .ip-address { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+        .ip-type { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .loading { color: var(--text-muted); font-style: italic; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+        .info-item { background: var(--bg-card); padding: 1rem 1.25rem; }
+        .info-key { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+        .info-val { font-family: 'JetBrains Mono', monospace; font-size: 0.9375rem; color: var(--text-primary); }
+        .info-val.loading { color: var(--text-muted); font-size: 0.8125rem; }
+        .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .btn { padding: 0.625rem 1.25rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .btn-primary { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .status { padding: 0.5rem 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; display: none; margin-bottom: 1rem; }
+        .status.ok { background: var(--accent-glow); border: 1px solid rgba(0,255,136,0.2); color: var(--accent); display: block; }
+        .status.err { background: var(--red-glow); border: 1px solid rgba(255,68,68,0.2); color: var(--red); display: block; }
+        .privacy-note { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.875rem; color: var(--text-secondary); }
+        .privacy-note strong { color: var(--text-primary); }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 640px) { .info-grid { grid-template-columns: 1fr; } .footer-content { flex-direction: column; gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="https://tools.acidbrns.cc" class="back-link" title="Zurück zu Tools">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                </a>
+                <a href="https://tools.acidbrns.cc" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>tools<span class="logo-divider">/</span>ip</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">IP Info</h1>
+                <p class="page-desc">Deine öffentliche IP-Adresse und Standortinformationen anzeigen. Nutzt ipwho.is, ipinfo.io oder freeipapi.com – keine Logs, kein Tracking.</p>
+            </div>
+
+            <div id="status" class="status"></div>
+
+            <div class="ip-hero">
+                <div class="ip-label">Deine öffentliche IP</div>
+                <div class="ip-address" id="ipAddress">Lädt...</div>
+                <div class="ip-type" id="ipType"></div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-key">Land</div>
+                    <div class="info-val loading" id="country">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">Region</div>
+                    <div class="info-val loading" id="region">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">Stadt</div>
+                    <div class="info-val loading" id="city">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">Zeitzone</div>
+                    <div class="info-val loading" id="timezone">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">ISP / Organisation</div>
+                    <div class="info-val loading" id="org">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">ASN</div>
+                    <div class="info-val loading" id="asn">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">Latitude</div>
+                    <div class="info-val loading" id="lat">–</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-key">Longitude</div>
+                    <div class="info-val loading" id="lon">–</div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="loadIP()">↻ Aktualisieren</button>
+                <button class="btn" onclick="copyIP()">📋 IP kopieren</button>
+            </div>
+
+            <div class="privacy-note">
+                <strong>Datenschutz:</strong> Zur Geolocation-Abfrage wird eine externe API (ipwho.is, ipinfo.io oder freeipapi.com) kontaktiert – deine IP wird dabei übertragen. Nutze einen VPN oder Tor, wenn du deine echte IP verbergen möchtest – dann wird hier die VPN-IP angezeigt.
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© 2026 acidbrns.cc</p>
+                <div class="footer-links"><a href="https://tools.acidbrns.cc">Alle Tools</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
+
+        function set(id, val) {
+            document.getElementById(id).textContent = val || '–';
+            document.getElementById(id).classList.remove('loading');
+        }
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = 'status ' + type;
+            if (type === 'ok') setTimeout(() => { el.className = 'status'; }, 3000);
+        }
+
+        async function fetchWithTimeout(url, timeout = 5000) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), timeout);
+            try {
+                const res = await fetch(url, { signal: ctrl.signal });
+                clearTimeout(timer);
+                return res;
+            } catch(e) {
+                clearTimeout(timer);
+                throw e;
+            }
+        }
+
+        async function tryIpwhoIs() {
+            const res = await fetchWithTimeout('https://ipwho.is/');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const d = await res.json();
+            if (!d.success) throw new Error(d.message || 'API error');
+            return {
+                ip: d.ip,
+                type: d.type,
+                country: (d.flag?.emoji ? d.flag.emoji + ' ' : '') + (d.country || ''),
+                region: d.region,
+                city: d.city,
+                timezone: d.timezone?.id,
+                org: d.connection?.org || d.connection?.isp,
+                asn: d.connection?.asn ? 'AS' + d.connection.asn : null,
+                lat: d.latitude,
+                lon: d.longitude
+            };
+        }
+
+        async function tryIpInfoIo() {
+            const res = await fetchWithTimeout('https://ipinfo.io/json');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const d = await res.json();
+            const [lat, lon] = d.loc ? d.loc.split(',') : [null, null];
+            const asnMatch = d.org ? d.org.match(/^(AS\d+)/) : null;
+            return {
+                ip: d.ip,
+                type: d.ip && d.ip.includes(':') ? 'IPv6' : 'IPv4',
+                country: d.country,
+                region: d.region,
+                city: d.city,
+                timezone: d.timezone,
+                org: d.org,
+                asn: asnMatch ? asnMatch[1] : null,
+                lat: lat,
+                lon: lon
+            };
+        }
+
+        async function tryFreeIpApi() {
+            const res = await fetchWithTimeout('https://free.freeipapi.com/api/json');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const d = await res.json();
+            return {
+                ip: d.ipAddress,
+                type: d.ipVersion === 6 ? 'IPv6' : 'IPv4',
+                country: d.countryName,
+                region: d.regionName,
+                city: d.cityName,
+                timezone: d.timeZone,
+                org: null,
+                asn: null,
+                lat: d.latitude,
+                lon: d.longitude
+            };
+        }
+
+        async function loadIP() {
+            document.getElementById('ipAddress').textContent = 'Lädt...';
+            ['country','region','city','timezone','org','asn','lat','lon'].forEach(id => {
+                const el = document.getElementById(id);
+                el.textContent = '–';
+                el.classList.add('loading');
+            });
+            document.getElementById('ipType').textContent = '';
+
+            const sources = [
+                { fn: tryIpwhoIs, name: 'ipwho.is' },
+                { fn: tryIpInfoIo, name: 'ipinfo.io' },
+                { fn: tryFreeIpApi, name: 'freeipapi.com' }
+            ];
+
+            let data = null;
+            let lastErr = null;
+            for (const src of sources) {
+                try {
+                    data = await src.fn();
+                    break;
+                } catch(e) {
+                    lastErr = e;
+                }
+            }
+
+            if (!data) {
+                document.getElementById('ipAddress').textContent = 'Fehler';
+                showStatus('Alle APIs nicht erreichbar: ' + lastErr.message, 'err');
+                return;
+            }
+
+            document.getElementById('ipAddress').textContent = data.ip || '–';
+            document.getElementById('ipType').textContent = data.type || '';
+            set('country', data.country);
+            set('region', data.region);
+            set('city', data.city);
+            set('timezone', data.timezone);
+            set('org', data.org);
+            set('asn', data.asn);
+            set('lat', data.lat != null ? Number(data.lat).toFixed(4) : null);
+            set('lon', data.lon != null ? Number(data.lon).toFixed(4) : null);
+        }
+
+        function copyIP() {
+            const ip = document.getElementById('ipAddress').textContent;
+            if (!ip || ip === 'Lädt...' || ip === 'Fehler') return;
+            navigator.clipboard.writeText(ip).then(() => showStatus('IP kopiert: ' + ip, 'ok'));
+        }
+
+        loadIP();
+    </script>
+</body>
+</html>

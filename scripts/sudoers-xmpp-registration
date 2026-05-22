@@ -1,0 +1,6 @@
+# Install to /etc/sudoers.d/xmpp-registration (root:root, mode 0440).
+# The web user (gunicorn runs as www-data) may run only the validated wrapper
+# as the prosody user. The wrapper enforces username charset/length and a fixed
+# domain, so this grant is restricted to exactly one command with no argument
+# injection surface.
+www-data ALL=(prosody) NOPASSWD: /usr/local/sbin/xmpp-prosody-admin

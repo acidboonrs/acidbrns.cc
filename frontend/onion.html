@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tor Onion Service — acidbrns.cc</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tor-Lila Theme — ueberschreibt nur die Akzent-Variablen aus style.css */
+        :root {
+            --accent: #7d4698;
+            --accent-hover: #9a5fb8;
+            --accent-glow: rgba(125, 70, 152, 0.18);
+            --success: #7d4698;
+        }
+
+        /* Layered Onion Header */
+        .onion-hero {
+            text-align: center;
+            padding: 2.5rem 1rem 2rem;
+            position: relative;
+            background: radial-gradient(ellipse at top, rgba(125, 70, 152, 0.18), transparent 70%);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .onion-hero .onion-icon {
+            font-size: 4rem;
+            line-height: 1;
+            display: inline-block;
+            filter: drop-shadow(0 0 24px rgba(125, 70, 152, 0.6));
+            margin-bottom: 0.5rem;
+        }
+        .onion-hero h1 { margin: 0.25rem 0; }
+        .onion-hero .subtitle { color: var(--text-secondary); margin: 0; }
+
+        /* Address-Block — gross, kopierbar, lila Glow */
+        .onion-address {
+            display: block;
+            background: var(--bg-secondary);
+            border: 1px solid #7d4698;
+            border-radius: 8px;
+            padding: 1.25rem 1rem;
+            font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+            font-size: 0.95rem;
+            color: var(--accent);
+            word-break: break-all;
+            user-select: all;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(125, 70, 152, 0.15) inset;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .onion-address:hover {
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 28px rgba(125, 70, 152, 0.25) inset, 0 0 12px rgba(125, 70, 152, 0.4);
+        }
+
+        /* Section-Cards mit lila Linker-Rand */
+        .onion-section {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.25rem 0;
+        }
+        .onion-section h2 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+        .onion-section h3 {
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.4rem;
+            margin-top: 1.5rem;
+        }
+        .onion-section ul li::marker { color: var(--accent); }
+
+        /* Code-Bloecke */
+        .onion-section pre {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .onion-section code {
+            background: var(--bg-secondary);
+            color: var(--accent);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .onion-section a { color: var(--accent); }
+        .onion-section a:hover { color: var(--accent-hover); }
+
+        .fingerprint {
+            display: inline-block;
+            font-family: ui-monospace, monospace;
+            background: var(--bg-secondary);
+            color: var(--accent);
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            user-select: all;
+        }
+
+        .download-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin: 0.75rem 0 1rem;
+        }
+        .download-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .download-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header class="onion-hero">
+            <div class="onion-icon">🧅</div>
+            <h1>Tor Onion Service</h1>
+            <p class="subtitle">acidbrns.cc auch im Tor-Netzwerk erreichbar</p>
+        </header>
+
+        <main>
+            <section class="onion-section">
+                <h2>Adresse</h2>
+                <p>Diese Seite ist als Tor Hidden Service v3 erreichbar:</p>
+                <a class="onion-address" href="http://6uolpn5semitqdrjgawl4te7o6tn636bacvcjux6lyf7vh4kc4giglid.onion/">http://6uolpn5semitqdrjgawl4te7o6tn636bacvcjux6lyf7vh4kc4giglid.onion/</a>
+                <p style="margin-top:1rem;">Tor-Browser-Nutzer auf der Clearnet-Seite werden ueber den <code>Onion-Location</code>-Header automatisch auf die Onion-Variante hingewiesen.</p>
+            </section>
+
+            <section class="onion-section">
+                <h2>Warum?</h2>
+                <ul>
+                    <li>Zugriff auf den XMPP-Account-Service ohne dass Cloudflare oder andere CDN-Pfade beruehrt werden</li>
+                    <li>Keine Verbindungs-Metadaten gegenueber dem Hosting-Provider</li>
+                    <li>Bot-Schutz komplett ohne Cloudflare/Turnstile — nur serverseitiges Mathe-Captcha, keine externe JavaScript-Quelle</li>
+                    <li>Funktioniert auch aus Netzen in denen XMPP oder die Clearnet-Adresse blockiert sind</li>
+                </ul>
+            </section>
+
+            <section class="onion-section">
+                <h2>Verifikation per PGP</h2>
+                <p>Damit du sicher sein kannst, dass die obenstehende Onion-Adresse wirklich von mir stammt und nicht durch eine kompromittierte Clearnet-Seite ausgetauscht wurde, ist sie mit meinem PGP-Schluessel signiert.</p>
+
+                <h3>Public Key</h3>
+                <p>Fingerprint:</p>
+                <p><span class="fingerprint">4F1B C60D F274 B182 F947  4608 DA3D 2F79 095A DC97</span></p>
+
+                <h3>Downloads</h3>
+                <div class="download-row">
+                    <a class="download-btn" href="/pubkey.asc" download>⬇ pubkey.asc</a>
+                    <a class="download-btn" href="/onion-statement.asc" download>⬇ onion-statement.asc</a>
+                </div>
+
+                <h3>Statement (Vorschau)</h3>
+                <p style="color:var(--text-secondary);font-size:0.9em;">Das ist nur die <em>angezeigte</em> Version. Verlasse dich nicht auf den gerenderten Text — lade <code>onion-statement.asc</code> herunter und verifiziere die Signatur lokal (siehe naechster Abschnitt). Wenn diese Seite kompromittiert waere, koennte hier alles stehen.</p>
+                <pre style="font-size:0.78em;line-height:1.4;">-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Ich, acidbrns, betreibe als von mir kontrollierten Tor Hidden Service:
+
+  http://6uolpn5semitqdrjgawl4te7o6tn636bacvcjux6lyf7vh4kc4giglid.onion/
+
+Stand: 2026-05-07
+Public-Key-Fingerprint: 4F1BC60DF274B182F9474608DA3D2F79095ADC97
+
+Wer Zweifel hat, ob diese Adresse aktuell ist: das hier ist
+die einzige offizielle Quelle. Andere Onion-Adressen, die
+sich als acidbrns.cc ausgeben, sind nicht von mir.
+-----BEGIN PGP SIGNATURE-----
+
+iJEEARYKADkWIQRPG8YN8nSxgvlHRgjaPS95CVrclwUCafyMnhsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDEACgkQ2j0veQla3JcgHAEApNJyEgsSeU6yiigkG+Yn
+MsKWDGjmZDYcNVIp+SN2X7YBANiUZM3NE7Dtc1C4JE5gEcoU1L4Mm2XJqRQ2bnOH
+ZMEE
+=trH5
+-----END PGP SIGNATURE-----</pre>
+
+                <h3>Verifikation auf der Kommandozeile</h3>
+                <pre># Public Key importieren
+gpg --import pubkey.asc
+
+# Statement verifizieren
+gpg --verify onion-statement.asc</pre>
+                <p>Wenn die Ausgabe <code>Good signature</code> sagt und der Fingerprint mit dem oben genannten uebereinstimmt, ist die Onion-Adresse echt.</p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 acidbrns.cc |
+                <a href="/">Start</a> |
+                <a href="/datenschutz.html">Datenschutz</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

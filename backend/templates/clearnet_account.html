@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Account-Verwaltung — acidbrns.cc</title>
+    <link rel="stylesheet" href="/style.v2.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Account-Verwaltung</h1>
+            <p class="subtitle">Passwort ändern oder Account löschen</p>
+        </header>
+
+        <main>
+            {% if errors %}
+            <section class="form-section">
+                <div class="message-box error" style="display:block">
+                    <strong>Folgende Probleme sind aufgetreten:</strong>
+                    <ul>{% for err in errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="privacy-box">
+                <h2>🔐 Komplett JavaScript-frei</h2>
+                <p>Auch diese Seite läuft ohne JS. Alle Aktionen laufen über klassische HTML-Forms, Bot-Schutz via Mathe-Frage + Honeypot.</p>
+            </section>
+
+            <!-- Passwort ändern -->
+            <section class="form-section">
+                <h2>🔑 Passwort ändern</h2>
+                <form method="POST" action="/account/change-password" autocomplete="off">
+                    <div class="hp-field" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cp_username">Benutzername</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="cp_username" name="username"
+                                   required pattern="[a-z0-9_-]{3,32}"
+                                   autocomplete="username">
+                            <span class="domain-suffix">@acidbrns.cc</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cp_current">Aktuelles Passwort</label>
+                        <input type="password" id="cp_current" name="current_password"
+                               required autocomplete="current-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cp_new1">Neues Passwort</label>
+                        <input type="password" id="cp_new1" name="new_password"
+                               required minlength="12" maxlength="128"
+                               autocomplete="new-password">
+                        <small class="help-text">Mindestens 12 Zeichen mit Groß-, Kleinbuchstaben, Zahlen und Sonderzeichen</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cp_new2">Neues Passwort wiederholen</label>
+                        <input type="password" id="cp_new2" name="new_password2"
+                               required minlength="12" maxlength="128"
+                               autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cp_math"><span class="icon">🧮</span> Bot-Schutz: {{ math_question }} = ?</label>
+                        <input type="text" id="cp_math" name="math_answer" required
+                               inputmode="numeric" pattern="[0-9]+" autocomplete="off"
+                               style="max-width:8rem;">
+                        <input type="hidden" name="math_token" value="{{ math_token }}">
+                    </div>
+
+                    <button type="submit" class="btn-submit">Passwort ändern</button>
+                </form>
+            </section>
+
+            <!-- Account löschen -->
+            <section class="form-section">
+                <h2 style="color:#ff4444;">⚠️ Account löschen</h2>
+                <p style="color:#ff8888;">
+                    Diese Aktion ist <strong>endgültig</strong>.
+                    Alle Account-Daten werden aus der Datenbank und vom XMPP-Server entfernt.
+                </p>
+                <form method="POST" action="/account/delete" autocomplete="off">
+                    <div class="hp-field" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="del_username">Benutzername</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="del_username" name="username"
+                                   required pattern="[a-z0-9_-]{3,32}"
+                                   autocomplete="username">
+                            <span class="domain-suffix">@acidbrns.cc</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="del_password">Passwort</label>
+                        <input type="password" id="del_password" name="password"
+                               required autocomplete="current-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="del_confirm">Tippe <code>LOESCHEN</code> zum Bestätigen</label>
+                        <input type="text" id="del_confirm" name="confirm_text"
+                               required placeholder="LOESCHEN" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="del_math"><span class="icon">🧮</span> Bot-Schutz: {{ math_question }} = ?</label>
+                        <input type="text" id="del_math" name="math_answer" required
+                               inputmode="numeric" pattern="[0-9]+" autocomplete="off"
+                               style="max-width:8rem;">
+                        <input type="hidden" name="math_token" value="{{ math_token }}">
+                    </div>
+
+                    <button type="submit" class="btn-submit" style="background:#cc0000;">
+                        Account endgültig löschen
+                    </button>
+                </form>
+            </section>
+
+            <p class="help-text">
+                Passwort vergessen? <a href="/reset">Passwort zurücksetzen</a>
+            </p>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 acidbrns.cc |
+                <a href="/">Startseite</a> |
+                <a href="/datenschutz.html">Datenschutz</a> |
+                <a href="/onion.html">🧅 Tor Onion</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

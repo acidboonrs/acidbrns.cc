@@ -1,0 +1,27 @@
+# Secrets / runtime
+backend/.env
+*.env.bak*
+*.bak
+*.bak-*
+*.bak.*
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Node / tooling
+node_modules/
+.wrangler/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Claude Code local settings (do not publish)
+.claude/
+CLAUDE.local.md

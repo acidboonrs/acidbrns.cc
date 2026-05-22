@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datenschutzerklärung – acidbrns.cc</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Datenschutzerklärung</h1>
+            <p class="subtitle">Informationen zur Verarbeitung personenbezogener Daten</p>
+        </header>
+
+        <main>
+            <section class="form-section">
+                <p><a href="/">← Zurück zur Startseite</a></p>
+
+                <h2>1. Verantwortlicher</h2>
+                <p>
+                    Verantwortlich für die Verarbeitung personenbezogener Daten im Sinne
+                    der Datenschutz-Grundverordnung (DSGVO) ist:
+                </p>
+                <p>
+                    <strong>Kali Root</strong><br>
+                    /dev/null Lane 127<br>
+                    1337 Localhost<br>
+                    Schicht 0
+                </p>
+                <p>
+                    Email: <a href="mailto:admin@acidbrns.cc">admin@acidbrns.cc</a><br>
+                    XMPP: admin@acidbrns.cc
+                </p>
+
+                <h2>2. Erhobene Daten und Verarbeitungszwecke</h2>
+
+                <h3>2.1 Account-Registrierung</h3>
+                <p>Bei der Registrierung eines XMPP-Accounts werden folgende Daten verarbeitet:</p>
+                <ul>
+                    <li><strong>Benutzername (JID-Local-Part):</strong> öffentlich, Pflichtangabe</li>
+                    <li><strong>Passwort-Hash:</strong> bcrypt mit Cost-Faktor 12, das Klartext-Passwort wird zu keinem Zeitpunkt gespeichert</li>
+                    <li><strong>Email-Adresse:</strong> freiwillig, ausschließlich für Account-Wiederherstellung (Passwort-Reset)</li>
+                    <li><strong>IP-Adresse:</strong> wird zum Schutz vor Spam und Mehrfach-Registrierungen für 24 Stunden gespeichert (Rate-Limiting)</li>
+                    <li><strong>Registrierungs-Zeitstempel</strong></li>
+                    <li><strong>User-Agent:</strong> wird in den Logs für 24 Stunden vorgehalten</li>
+                </ul>
+                <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung) sowie
+                    Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am Schutz vor Missbrauch).</p>
+
+                <h3>2.2 XMPP-Nachrichten</h3>
+                <p>
+                    Übermittelte Nachrichten werden – abhängig von den Einstellungen des
+                    jeweiligen XMPP-Clients – für Offline-Zustellung (XEP-0313 Message Archive
+                    Management) zwischengespeichert. Standardmäßig sind Konversationen
+                    Ende-zu-Ende-verschlüsselt mittels OMEMO. Inhalte verschlüsselter
+                    Nachrichten sind für den Server-Betreiber nicht lesbar.
+                </p>
+
+                <h3>2.3 Server-Logs</h3>
+                <p>
+                    Beim Aufruf der Webseite verarbeitet der Webserver automatisch:
+                    IP-Adresse, Datum/Uhrzeit, abgerufene Ressource, Referrer, User-Agent,
+                    HTTP-Statuscode. Diese Logs werden nach 24 Stunden automatisch gelöscht.
+                </p>
+
+                <h2>3. Cookies und externe Dienste</h2>
+
+                <h3>3.1 Bot-Schutz (Captcha)</h3>
+                <p>
+                    Zum Schutz vor automatisierten Massen-Registrierungen kommt ein einfacher,
+                    selbst gehosteter Bot-Schutz zum Einsatz: eine Rechen-Aufgabe (Mathe-Captcha)
+                    sowie ein verstecktes Honeypot-Feld. Die Prüfung erfolgt vollständig auf unserem
+                    eigenen Server — es werden keine externen Dienste (z.&nbsp;B. Cloudflare oder Google)
+                    eingebunden, kein JavaScript geladen und keine Daten an Dritte übermittelt.
+                </p>
+
+                <h3>3.2 Email-Versand (Passwort-Reset)</h3>
+                <p>
+                    Für den Versand von Passwort-Reset-Mails wird Proton Mail (Proton AG,
+                    Route de la Galaise 32, 1228 Plan-les-Ouates, Schweiz) als SMTP-Anbieter
+                    verwendet. Die Schweiz gilt als sicheres Drittland (Angemessenheits­beschluss).
+                </p>
+
+                <h3>3.3 Cookies</h3>
+                <p>
+                    Diese Webseite setzt selbst keine Tracking- oder Marketing-Cookies.
+                    Es wird lediglich ein technisch notwendiges, erstanbieterliches Cookie gesetzt,
+                    um den erfolgreichen Bot-Schutz-Durchgang für die Dauer der Sitzung zu merken.
+                </p>
+
+                <h2>4. Speicherdauer</h2>
+                <ul>
+                    <li><strong>Account-Daten:</strong> bis zur Löschung des Accounts durch den Nutzer</li>
+                    <li><strong>IP-Adressen in Logs:</strong> 24 Stunden</li>
+                    <li><strong>Passwort-Reset-Tokens:</strong> 5 Minuten nach Erstellung, danach automatisch ungültig</li>
+                    <li><strong>Webserver-Logs:</strong> 24 Stunden</li>
+                </ul>
+
+                <h2>5. Empfänger der Daten</h2>
+                <p>
+                    Eine Weitergabe personenbezogener Daten an Dritte erfolgt nicht, mit Ausnahme der
+                    in Abschnitt 3 genannten technischen Dienstleister (Proton Mail).
+                    Behördliche Auskunftsersuchen werden nur bei rechtswirksamer Anordnung beantwortet.
+                </p>
+
+                <h2>6. Deine Rechte</h2>
+                <p>Nach DSGVO stehen dir folgende Rechte zu:</p>
+                <ul>
+                    <li><strong>Auskunft</strong> über die zu deiner Person gespeicherten Daten (Art. 15 DSGVO)</li>
+                    <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16 DSGVO)</li>
+                    <li><strong>Löschung</strong> – über die <a href="/account.html">Account-Verwaltung</a> kannst du deinen Account jederzeit selbst löschen (Art. 17 DSGVO)</li>
+                    <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18 DSGVO)</li>
+                    <li><strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO)</li>
+                    <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21 DSGVO)</li>
+                    <li><strong>Beschwerde</strong> bei einer Aufsichtsbehörde (Art. 77 DSGVO)</li>
+                </ul>
+
+                <h2>7. Sicherheit</h2>
+                <p>
+                    Die Verbindung zur Webseite ist durchgehend per TLS verschlüsselt.
+                    Passwörter werden ausschließlich als bcrypt-Hash gespeichert. Der XMPP-Server
+                    verlangt verschlüsselte Verbindungen (TLS) und unterstützt OMEMO-Ende-zu-Ende-
+                    Verschlüsselung für Nachrichten. Anti-Spam- und Anti-Brute-Force-Mechanismen
+                    (Rate-Limiting, fail2ban) schützen vor Missbrauch.
+                </p>
+
+                <h2>8. Änderungen dieser Erklärung</h2>
+                <p>
+                    Diese Datenschutzerklärung kann angepasst werden, um sie an geänderte
+                    Rechtslagen oder bei Änderungen am Dienst anzupassen. Es gilt die jeweils
+                    auf dieser Seite veröffentlichte Fassung.
+                </p>
+
+                <p><em>Stand: Mai 2026</em></p>
+
+                <p><a href="/">← Zurück zur Startseite</a></p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 acidbrns.cc |
+                <a href="/datenschutz.html">Datenschutz</a> | <a href="/onion.html">🧅 Tor Onion</a> |
+                <a href="/account.html">Account</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

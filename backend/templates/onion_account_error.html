@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer"><title>Aktion fehlgeschlagen</title>
+<link rel="stylesheet" href="/style.css"><link rel="icon" type="image/svg+xml" href="/favicon.svg"></head>
+<body><div class="container">
+<header><h1>⚠️ Aktion fehlgeschlagen</h1></header>
+<main><section class="form-section">
+<div class="message-box error" style="display:block">
+<strong>Folgende Probleme sind aufgetreten:</strong>
+<ul>{% for err in errors %}<li>{{ err }}</li>{% endfor %}</ul>
+</div>
+<p style="margin-top:1rem"><a href="/account.html">← Zurück zur Account-Verwaltung</a> · <a href="/">Startseite</a></p>
+</section></main></div></body></html>

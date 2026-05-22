@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Passwort zurücksetzen — acidbrns.cc</title>
+    <link rel="stylesheet" href="/style.v2.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔑 Passwort zurücksetzen</h1>
+            <p class="subtitle">Account-Wiederherstellung per Email</p>
+        </header>
+
+        <main>
+            {% if errors %}
+            <section class="form-section">
+                <div class="message-box error" style="display:block">
+                    <strong>Folgende Probleme sind aufgetreten:</strong>
+                    <ul>{% for err in errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="privacy-box">
+                <h2>🔐 Komplett JavaScript-frei</h2>
+                <p>Reset läuft über klassische HTML-Forms und einen per Mail zugesandten Link. Kein JS notwendig.</p>
+            </section>
+
+            {% if mode == 'request' %}
+            <section class="form-section">
+                <h2>Reset anfordern</h2>
+                <p class="help-text">
+                    Gib deinen Benutzernamen oder die hinterlegte Email-Adresse ein.
+                    Falls ein Account existiert und eine Email hinterlegt ist, senden wir dir einen Link.
+                </p>
+                <form method="POST" action="/reset/request" autocomplete="off" style="margin-top:1.5rem;">
+                    <div class="hp-field" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="identifier"><span class="icon">👤</span> Benutzername oder Email</label>
+                        <input type="text" id="identifier" name="identifier" required
+                               placeholder="dein-name oder email@beispiel.de"
+                               autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rr_math"><span class="icon">🧮</span> Bot-Schutz: {{ math_question }} = ?</label>
+                        <input type="text" id="rr_math" name="math_answer" required
+                               inputmode="numeric" pattern="[0-9]+" autocomplete="off"
+                               style="max-width:8rem;">
+                        <input type="hidden" name="math_token" value="{{ math_token }}">
+                    </div>
+
+                    <button type="submit" class="btn-submit">Reset-Link anfordern</button>
+                </form>
+
+                <p class="help-text" style="margin-top:1rem;">
+                    <a href="/account">← Zurück zur Anmeldung</a>
+                </p>
+            </section>
+            {% else %}
+            <section class="form-section">
+                <h2>Neues Passwort setzen</h2>
+                <form method="POST" action="/reset/confirm" autocomplete="off">
+                    <div class="hp-field" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+                    <input type="hidden" name="token" value="{{ token }}">
+
+                    <div class="form-group">
+                        <label for="rc_pw1">Neues Passwort</label>
+                        <input type="password" id="rc_pw1" name="new_password" required
+                               minlength="12" maxlength="128" autocomplete="new-password">
+                        <small class="help-text">Mindestens 12 Zeichen mit Groß-, Kleinbuchstaben, Zahlen und Sonderzeichen</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rc_pw2">Passwort wiederholen</label>
+                        <input type="password" id="rc_pw2" name="new_password2" required
+                               minlength="12" maxlength="128" autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rc_math"><span class="icon">🧮</span> Bot-Schutz: {{ math_question }} = ?</label>
+                        <input type="text" id="rc_math" name="math_answer" required
+                               inputmode="numeric" pattern="[0-9]+" autocomplete="off"
+                               style="max-width:8rem;">
+                        <input type="hidden" name="math_token" value="{{ math_token }}">
+                    </div>
+
+                    <button type="submit" class="btn-submit">Passwort zurücksetzen</button>
+                </form>
+            </section>
+            {% endif %}
+        </main>
+
+        <footer>
+            <p>&copy; 2026 acidbrns.cc |
+                <a href="/">Startseite</a> |
+                <a href="/datenschutz.html">Datenschutz</a> |
+                <a href="/onion.html">🧅 Tor Onion</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

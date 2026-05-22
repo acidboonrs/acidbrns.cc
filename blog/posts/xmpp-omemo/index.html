@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="So richtest du einen eigenen XMPP-Server mit Ende-zu-Ende-Verschlüsselung via OMEMO ein.">
+    <title>XMPP-Server mit OMEMO verschlüsseln – acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #09090b; --bg-secondary: #0f0f12; --bg-card: #131316; --text-primary: #fafafa; --text-secondary: #71717a; --text-muted: #52525b; --accent: #00ff88; --accent-glow: rgba(0, 255, 136, 0.15); --border: #27272a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 720px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; justify-content: space-between; }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .post-header { margin-bottom: 2.5rem; }
+        .post-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .post-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 500; color: var(--accent); background: var(--accent-glow); padding: 0.25rem 0.5rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .post-title { font-size: 2rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.75rem; }
+        .post-desc { color: var(--text-secondary); font-size: 1.0625rem; }
+        .post-content { font-size: 1rem; line-height: 1.8; color: var(--text-secondary); }
+        .post-content h2 { color: var(--text-primary); font-size: 1.375rem; margin: 2.5rem 0 1rem; }
+        .post-content h3 { color: var(--text-primary); font-size: 1.125rem; margin: 2rem 0 0.75rem; }
+        .post-content p { margin-bottom: 1.25rem; }
+        .post-content ul, .post-content ol { margin: 0 0 1.25rem 1.5rem; }
+        .post-content li { margin-bottom: 0.5rem; }
+        .post-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; background: var(--bg-card); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--accent); }
+        .post-content pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; overflow-x: auto; }
+        .post-content pre code { background: none; border: none; padding: 0; font-size: 0.8125rem; color: var(--text-primary); }
+        .post-content strong { color: var(--text-primary); }
+        .post-content a { color: var(--accent); text-decoration: none; }
+        .post-content a:hover { text-decoration: underline; }
+        .post-content blockquote { border-left: 3px solid var(--accent); padding: 0.75rem 1.25rem; margin: 1.25rem 0; background: var(--accent-glow); border-radius: 0 8px 8px 0; }
+        .post-content blockquote p { margin-bottom: 0; color: var(--text-primary); }
+        .post-nav { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .post-nav a { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+        .post-nav a:hover { text-decoration: underline; }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links { display: flex; gap: 1rem; }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 640px) { .post-title { font-size: 1.5rem; } .header-content { flex-direction: column; align-items: flex-start; } .footer-content { flex-direction: column; gap: 1rem; text-align: center; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/" class="back-link" title="Zurück zum Blog">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                    </a>
+                    <a href="/" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>blog</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <div class="post-header">
+                <div class="post-meta">
+                    <span class="post-date">2026-01-02</span>
+                    <span class="post-tag">Selfhosting</span>
+                </div>
+                <h1 class="post-title">XMPP-Server mit OMEMO verschlüsseln</h1>
+                <p class="post-desc">So richtest du einen eigenen XMPP-Server mit Ende-zu-Ende-Verschlüsselung via OMEMO ein.</p>
+            </div>
+            <div class="post-content">
+
+                <h2>Was ist XMPP?</h2>
+                <p>XMPP (Extensible Messaging and Presence Protocol) ist ein offenes, dezentrales Kommunikationsprotokoll. Im Gegensatz zu WhatsApp, Signal oder Telegram betreibst du deinen eigenen Server und behältst die volle Kontrolle über deine Daten. XMPP nutzt eine föderierte Architektur &ndash; ähnlich wie E-Mail &ndash;, sodass Nutzer verschiedener Server problemlos miteinander kommunizieren können.</p>
+
+                <h2>Was ist OMEMO?</h2>
+                <p>OMEMO (OMEMO Multi-End Message and Object Encryption) ist eine Ende-zu-Ende-Verschlüsselung für XMPP, die auf dem Signal-Protokoll (Double Ratchet) basiert. Im Unterschied zu OTR unterstützt OMEMO <strong>mehrere Geräte gleichzeitig</strong> und verschlüsselt auch Dateien. Der Server sieht dabei nur verschlüsselte Daten &ndash; selbst als Admin kannst du keine Nachrichten mitlesen.</p>
+                <p>OMEMO benötigt auf dem Server kein spezielles Modul, sondern setzt auf <strong>PEP (Personal Eventing Protocol)</strong> und <strong>PubSub</strong>, um die öffentlichen Schlüssel der Geräte zu verteilen. Diese Module müssen korrekt konfiguriert sein.</p>
+
+                <h2>Prosody installieren</h2>
+                <p>Wir verwenden <a href="https://prosody.im/">Prosody</a> als XMPP-Server. Prosody ist leichtgewichtig, modular und hervorragend dokumentiert. Auf Debian oder Ubuntu installierst du zuerst das offizielle Repository, um die neueste Version zu erhalten:</p>
+<pre><code>sudo apt install apt-transport-https
+echo "deb https://packages.prosody.im/debian $(lsb_release -cs) main" | \
+  sudo tee /etc/apt/sources.list.d/prosody.list
+curl -fsSL https://prosody.im/files/prosody-debian-packages.key | \
+  sudo tee /etc/apt/trusted.gpg.d/prosody.asc
+sudo apt update
+sudo apt install prosody prosody-modules</code></pre>
+                <p>Das Paket <code>prosody-modules</code> enthält die Community-Module, die wir für HTTP-Upload und andere Features brauchen.</p>
+
+                <h2>TLS-Zertifikate einrichten</h2>
+                <p>Verschlüsselung beginnt auf der Transportebene. Ohne gültiges TLS-Zertifikat verweigern die meisten Clients und anderen Server die Verbindung. Am einfachsten geht das mit Let's Encrypt:</p>
+<pre><code>sudo apt install certbot
+sudo certbot certonly --standalone -d xmpp.example.com \
+  -d conference.xmpp.example.com \
+  -d upload.xmpp.example.com</code></pre>
+                <p>Anschließend importierst du die Zertifikate in Prosody:</p>
+<pre><code>sudo prosodyctl --root cert import /etc/letsencrypt/live/</code></pre>
+                <p>Richte einen Cronjob oder systemd-Timer ein, der nach der Erneuerung automatisch <code>prosodyctl cert import</code> und <code>prosodyctl reload</code> ausführt.</p>
+
+                <h2>PEP und PubSub für OMEMO aktivieren</h2>
+                <p>Öffne die Hauptkonfiguration unter <code>/etc/prosody/prosody.cfg.lua</code> und stelle sicher, dass folgende Module geladen werden:</p>
+<pre><code>modules_enabled = {
+    -- Core
+    "roster";
+    "saslauth";
+    "tls";
+    "dialback";
+    "disco";
+
+    -- OMEMO-relevante Module
+    "pep";
+    "pep_simple";
+    "pubsub";
+
+    -- Nützliche Erweiterungen
+    "carbons";        -- Nachrichten an alle Geräte
+    "mam";            -- Nachrichtenarchiv
+    "smacks";         -- Stream Management
+    "csi_simple";     -- Client State Indication
+    "cloud_notify";   -- Push-Benachrichtigungen
+    "http_upload";    -- Datei-Upload
+    "blocklist";
+    "bookmarks";
+    "vcard_legacy";
+}</code></pre>
+                <blockquote><p>Wichtig: Das Modul <code>pep</code> ist zwingend erforderlich. Ohne PEP kann kein Client seine OMEMO-Schlüssel veröffentlichen, und die Verschlüsselung schlägt fehl.</p></blockquote>
+
+                <h2>HTTP File Upload für verschlüsselte Medien</h2>
+                <p>OMEMO verschlüsselt nicht nur Text, sondern auch Bilder, Videos und Dateien. Dafür müssen die verschlüsselten Dateien über HTTP Upload (XEP-0363) hochgeladen werden. Konfiguriere eine eigene Subdomain:</p>
+<pre><code>Component "upload.xmpp.example.com" "http_upload"
+    http_upload_file_size_limit = 104857600  -- 100 MB
+    http_upload_expire_after = 60 * 60 * 24 * 30  -- 30 Tage
+    http_upload_quota = 1073741824  -- 1 GB pro Nutzer
+    http_external_url = "https://upload.xmpp.example.com/"</code></pre>
+                <p>Falls du einen Reverse Proxy wie nginx nutzt, leite den Traffic entsprechend weiter:</p>
+<pre><code>server {
+    listen 443 ssl http2;
+    server_name upload.xmpp.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/upload.xmpp.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/upload.xmpp.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:5281/upload/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        client_max_body_size 105m;
+    }
+}</code></pre>
+
+                <h2>MAM (Message Archive Management) konfigurieren</h2>
+                <p>MAM (XEP-0313) speichert Nachrichten serverseitig, damit du sie auf neuen Geräten abrufen kannst. Bei OMEMO werden nur die verschlüsselten Daten archiviert &ndash; der Server kann den Inhalt nicht lesen.</p>
+<pre><code>archive_expires_after = "4w"  -- Nachrichten nach 4 Wochen löschen
+default_archive_policy = true  -- MAM standardmäßig aktiviert
+
+-- Für den VirtualHost:
+VirtualHost "xmpp.example.com"
+    ssl = {
+        key = "/etc/prosody/certs/xmpp.example.com.key";
+        certificate = "/etc/prosody/certs/xmpp.example.com.crt";
+    }
+
+Component "conference.xmpp.example.com" "muc"
+    modules_enabled = { "muc_mam"; }
+    muc_log_by_default = true
+    muc_log_expires_after = "4w"</code></pre>
+
+                <h2>Benutzer anlegen und Server starten</h2>
+<pre><code>sudo prosodyctl register alice xmpp.example.com sicheres-passwort
+sudo prosodyctl register bob xmpp.example.com anderes-passwort
+sudo systemctl enable --now prosody
+sudo prosodyctl status</code></pre>
+                <p>Prüfe, ob alle Module geladen wurden:</p>
+<pre><code>sudo prosodyctl about</code></pre>
+
+                <h2>Empfohlene Clients</h2>
+                <p>Nicht jeder XMPP-Client unterstützt OMEMO. Hier sind die besten Optionen je nach Plattform:</p>
+                <ul>
+                    <li><strong>Conversations</strong> (Android) &ndash; Der Goldstandard. OMEMO ist standardmäßig aktiviert, unterstützt Datei-Upload, Audio-/Videoanrufe und Push-Benachrichtigungen.</li>
+                    <li><strong>Gajim</strong> (Windows/Linux) &ndash; Feature-reicher Desktop-Client. Das OMEMO-Plugin muss über den Plugin-Manager installiert werden.</li>
+                    <li><strong>Dino</strong> (Linux) &ndash; Moderner, schlanker GTK-Client mit nativer OMEMO-Unterstützung. Ideal für GNOME-Nutzer.</li>
+                    <li><strong>Siskin IM</strong> (iOS) &ndash; Von den Tigase-Entwicklern, gute OMEMO-Integration und Push-Support für Apple-Geräte.</li>
+                </ul>
+
+                <h2>OMEMO-Schlüsselaustausch testen</h2>
+                <p>Nach der Anmeldung mit einem Client sollte OMEMO automatisch eingerichtet werden. Um den Schlüsselaustausch zu verifizieren:</p>
+                <ol>
+                    <li>Melde dich mit zwei Accounts an (z.B. Alice in Conversations, Bob in Dino).</li>
+                    <li>Alice sendet eine Nachricht an Bob. Der Client sollte ein Schloss-Symbol anzeigen.</li>
+                    <li>Überprüfe in den Account-Einstellungen die <strong>OMEMO-Fingerprints</strong>. Beide Seiten sollten den Fingerprint des Gegenübers sehen.</li>
+                    <li>Verifiziere die Fingerprints über einen sicheren Kanal (persönlich, QR-Code oder Telefonat).</li>
+                </ol>
+                <p>Falls der Schlüsselaustausch nicht funktioniert, überprüfe mit dem folgenden Befehl, ob PEP korrekt publiziert:</p>
+<pre><code># Prüfe, ob OMEMO-Daten im PEP-Knoten vorhanden sind:
+sudo prosodyctl shell
+> host = prosody.hosts["xmpp.example.com"]
+> for node in host.modules.pep.get_account_service("alice"):nodes() do print(node) end</code></pre>
+                <p>In der Ausgabe solltest du Knoten wie <code>eu.siacs.conversations.axolotl.devicelist</code> und <code>eu.siacs.conversations.axolotl.bundles:&lt;device-id&gt;</code> sehen.</p>
+
+                <h2>Fehlerbehebung und häufige Probleme</h2>
+
+                <h3>OMEMO wird im Client nicht angeboten</h3>
+                <p>Stelle sicher, dass <code>mod_pep</code> geladen ist. Prüfe die Logs unter <code>/var/log/prosody/prosody.log</code> auf Fehler. Ein häufiger Grund: Das Modul <code>pep_simple</code> fehlt oder wird von einem veralteten <code>pep_plus</code> blockiert.</p>
+
+                <h3>Datei-Upload schlägt fehl</h3>
+                <p>Überprüfe, ob die Upload-Komponente korrekt erreichbar ist:</p>
+<pre><code>curl -I https://upload.xmpp.example.com/</code></pre>
+                <p>Häufige Ursachen: Fehlende CORS-Header, falscher <code>http_external_url</code>, oder die Firewall blockiert Port 5281.</p>
+
+                <h3>Nachrichten kommen nicht auf allen Geräten an</h3>
+                <p>Aktiviere <code>mod_carbons</code> und <code>mod_smacks</code>. Carbons sorgt dafür, dass Nachrichten an alle angemeldeten Geräte kopiert werden. Ohne Stream Management (smacks) gehen Nachrichten bei instabilen Verbindungen verloren.</p>
+
+                <h3>Verbindungsprobleme mit anderen Servern</h3>
+                <p>Stelle sicher, dass deine DNS-Einträge korrekt gesetzt sind:</p>
+<pre><code>_xmpp-client._tcp.xmpp.example.com. 3600 IN SRV 0 5 5222 xmpp.example.com.
+_xmpp-server._tcp.xmpp.example.com. 3600 IN SRV 0 5 5269 xmpp.example.com.</code></pre>
+                <p>Teste die Federation mit dem <a href="https://compliance.conversations.im/">XMPP Compliance Tester</a>. Dieser prüft alle relevanten XEPs und zeigt dir, wo dein Server noch Lücken hat.</p>
+
+                <blockquote><p>Tipp: Führe regelmäßig <code>sudo apt update &amp;&amp; sudo apt upgrade prosody prosody-modules</code> aus. Sicherheitslücken in XMPP-Servern werden schnell ausgenutzt, und veraltete Module können die Verschlüsselung kompromittieren.</p></blockquote>
+
+            </div>
+            <div class="post-nav">
+                <a href="/">← Zurück zum Blog</a>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© 2026 acidbrns.cc</p>
+                <div class="footer-links">
+                    <a href="https://acidbrns.cc">Hauptseite</a>
+                    <a href="/">Blog</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script></script>
+</body>
+</html>

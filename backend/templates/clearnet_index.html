@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>XMPP Account Registrierung — acidbrns.cc</title>
+    <link rel="stylesheet" href="/style.v2.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="top-nav">
+                <a href="https://security.acidbrns.cc/">Security</a>
+                <a href="https://linux.acidbrns.cc/">Linux</a>
+                <a href="https://selfhosting.acidbrns.cc/">Selfhosting</a>
+                <a href="/info">Was sieht der Server?</a>
+            </nav>
+            <h1>🚀 XMPP Messenger</h1>
+            <p class="subtitle">Sichere, verschlüsselte Kommunikation</p>
+        </header>
+
+        <main>
+            <!-- Info-Bereich -->
+            <section class="info-box">
+                <h2>Warum XMPP?</h2>
+                <div class="features">
+                    <div class="feature">
+                        <div class="icon">🔒</div>
+                        <h3>Ende-zu-Ende Verschlüsselt</h3>
+                        <p>Mit OMEMO – niemand kann mitlesen</p>
+                    </div>
+                    <div class="feature">
+                        <div class="icon">🆓</div>
+                        <h3>Kostenlos &amp; Open Source</h3>
+                        <p>Keine versteckten Kosten</p>
+                    </div>
+                    <div class="feature">
+                        <div class="icon">🌍</div>
+                        <h3>Dezentral</h3>
+                        <p>Deine Daten bleiben bei dir</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tor-Empfehlung -->
+            <section class="tor-box">
+                <h2>🧅 Empfohlen: Nur über Tor nutzen</h2>
+                <p>Wir empfehlen <strong>ausdrücklich</strong>, diesen XMPP-Server ausschließlich über Tor zu nutzen. So bleiben keine Verbindungs-Metadaten (deine IP, Standort, ISP) auf unserem Server zurück — selbst wir können nicht sehen, wer sich verbindet.</p>
+                <p><strong>Android-Schnellstart mit Orbot:</strong></p>
+                <ol>
+                    <li>Orbot installieren (Tor-Proxy für Android)</li>
+                    <li>Orbot öffnen → <em>VPN-Modus</em> aktivieren</li>
+                    <li>Unter <em>App-Auswahl</em> deinen XMPP-Client (z.B. Conversations) hinzufügen</li>
+                    <li><em>Start</em> drücken — Verbindung läuft jetzt über Tor</li>
+                    <li>In Conversations als Server <code>acidbrns.cc</code> eintragen, fertig</li>
+                </ol>
+                <p style="margin-top:1rem;">
+                    <a class="tor-cta" href="https://guardianproject.info/fdroid/" target="_blank" rel="noopener">F-Droid (empfohlen)</a>
+                    <a class="tor-cta secondary" href="https://play.google.com/store/apps/details?id=org.torproject.android" target="_blank" rel="noopener">Google Play</a>
+                    <a class="tor-cta secondary" href="https://orbot.app/" target="_blank" rel="noopener">orbot.app</a>
+                </p>
+            </section>
+
+            <!-- Datenschutz / JS-frei -->
+            <section class="privacy-box">
+                <h2>🔐 Komplett JavaScript-frei &amp; datenschutz-fokussiert</h2>
+                <p>Diese Seite läuft <strong>vollständig ohne JavaScript</strong> — kein Tracking, keine Analytics, kein Fingerprinting. Auch das Registrierungs-Formular funktioniert mit einem reinen Text-Browser (Lynx, w3m, Tor Browser im Safest-Modus).</p>
+                <ul>
+                    <li>Keine Third-Party-Skripte, kein CDN-Fetch, keine Cookies</li>
+                    <li>Bot-Schutz ohne Cloudflare/Google — nur Honeypot + Mathe-Frage</li>
+                    <li>Keine Telemetrie, kein Logging über das nginx-Standardmaß hinaus</li>
+                    <li>Source ist offen — siehe <a href="https://github.com/acidboonrs" rel="noopener">GitHub</a></li>
+                </ul>
+            </section>
+
+            <!-- Services -->
+            <section class="form-section">
+                <h2>Services</h2>
+                <div class="services-list">
+                    <a href="https://blog.acidbrns.cc" class="service-card">
+                        <div class="service-icon">📖</div>
+                        <div class="service-content">
+                            <h3>blog.acidbrns.cc</h3>
+                            <p>Artikel über IT-Security, Selfhosting, Linux und Privacy</p>
+                            <span class="service-status online">● Online</span>
+                        </div>
+                        <span class="service-arrow">→</span>
+                    </a>
+                    <a href="https://status.acidbrns.cc" class="service-card">
+                        <div class="service-icon">📊</div>
+                        <div class="service-content">
+                            <h3>status.acidbrns.cc</h3>
+                            <p>Service-Status und Uptime-Monitoring aller Dienste</p>
+                            <span class="service-status online">● Online</span>
+                        </div>
+                        <span class="service-arrow">→</span>
+                    </a>
+                    <a href="https://tools.acidbrns.cc" class="service-card">
+                        <div class="service-icon">🛠️</div>
+                        <div class="service-content">
+                            <h3>tools.acidbrns.cc</h3>
+                            <p>Nützliche Online-Tools für Entwickler und Admins</p>
+                            <span class="service-status online">● Online</span>
+                        </div>
+                        <span class="service-arrow">→</span>
+                    </a>
+                    <a href="https://git.acidbrns.cc" class="service-card">
+                        <div class="service-icon">💻</div>
+                        <div class="service-content">
+                            <h3>git.acidbrns.cc</h3>
+                            <p>Self-hosted Git-Repository mit Gitea</p>
+                            <span class="service-status online">● Online</span>
+                        </div>
+                        <span class="service-arrow">→</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Registrierungs-Formular -->
+            <section class="form-section">
+                <h2>Account erstellen</h2>
+
+                {% if errors %}
+                <div class="message-box error" style="display:block">
+                    <strong>Folgende Probleme sind aufgetreten:</strong>
+                    <ul>
+                        {% for err in errors %}<li>{{ err }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/register" autocomplete="off">
+                    <!-- Honeypot: muss leer bleiben -->
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="website">Website (nicht ausfüllen):</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username"><span class="icon">👤</span> Benutzername</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="username" name="username"
+                                   value="{{ username }}"
+                                   placeholder="dein-name" required
+                                   pattern="[a-z0-9_-]{3,32}" autocomplete="username">
+                            <span class="domain-suffix">@acidbrns.cc</span>
+                        </div>
+                        <small class="help-text">3–32 Zeichen: Kleinbuchstaben, Zahlen, - und _</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email"><span class="icon">📧</span> E-Mail <span class="optional">(optional)</span></label>
+                        <input type="email" id="email" name="email"
+                               value="{{ email }}"
+                               placeholder="deine@email.de" maxlength="254"
+                               autocomplete="email">
+                        <small class="help-text">Nur für Account-Wiederherstellung</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password"><span class="icon">🔒</span> Passwort</label>
+                        <input type="password" id="password" name="password"
+                               placeholder="Sicheres Passwort" required
+                               minlength="12" maxlength="128" autocomplete="new-password">
+                        <small class="help-text">Mindestens 12 Zeichen mit Groß-, Kleinbuchstaben, Zahlen und Sonderzeichen</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2"><span class="icon">🔒</span> Passwort wiederholen</label>
+                        <input type="password" id="password2" name="password2"
+                               placeholder="Passwort bestätigen" required
+                               minlength="12" maxlength="128" autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="math_answer"><span class="icon">🧮</span> Bot-Schutz: {{ math_question }} = ?</label>
+                        <input type="text" id="math_answer" name="math_answer" required
+                               inputmode="numeric" pattern="[0-9]+" autocomplete="off"
+                               style="max-width:8rem;">
+                        <input type="hidden" name="math_token" value="{{ math_token }}">
+                        <small class="help-text">Bitte die Summe eintragen — JS-frei statt Cloudflare</small>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" name="privacy" required>
+                            Ich akzeptiere die <a href="/datenschutz.html">Datenschutzerklärung</a>
+                        </label>
+                    </div>
+
+                    <div class="info-notice">
+                        <strong>📌 Wichtig:</strong>
+                        <ul>
+                            <li>Deine Nachrichten sind Ende-zu-Ende verschlüsselt (OMEMO)</li>
+                            <li>Wir speichern keine unverschlüsselten Nachrichten</li>
+                            <li>Du kannst jeden XMPP-Client verwenden</li>
+                            <li>Erreichbar als <a href="/onion.html">Tor Hidden Service</a> — Registrierung und Login auch aus zensierten Netzen oder ohne Metadaten-Spuren beim Hosting-Provider</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Account erstellen 🚀</button>
+                </form>
+
+                <div class="footer-links">
+                    <p><a href="https://github.com/acidboonrs" target="_blank" rel="noopener">Repositories erkunden</a></p>
+                </div>
+            </section>
+
+            <!-- Spenden -->
+            <section class="donate-section">
+                <h2>☕ Projekt unterstützen</h2>
+                <p class="donate-intro">
+                    Die Infrastruktur läuft auf Dedicated Hardware — 2× Intel Xeon Gold 6154, 256 GB ECC RAM,
+                    NVMe-RAID — vollständig selbst betrieben und finanziert. Der Traffic wird über einen
+                    Bulletproof-Server in einem datenschutzrechtlich sicheren Land reverse proxied,
+                    sodass die Ursprungs-IP zu keinem Zeitpunkt exponiert wird.
+                    Kein Managed Hosting, keine Datenweitergabe, keine Werbung.
+                    Die laufenden Kosten umfassen Strom, Colocation, Servermiete, Domains, SSL und Wartung.
+                    Wer den Betrieb unterstützen möchte — jede Spende hilft direkt. Danke.
+                </p>
+                <div class="donate-coins">
+                    <div class="donate-card">
+                        <div class="coin-header">
+                            <span class="coin-icon">ⓧ</span>
+                            <div>
+                                <h3>Monero (XMR)</h3>
+                                <span class="coin-badge xmr">Privat &amp; anonym</span>
+                            </div>
+                        </div>
+                        <p class="coin-desc">Monero verschlüsselt Sender, Empfänger und Betrag on-chain — keine Blockchain-Analyse möglich.</p>
+                        <div class="address-box">
+                            <code>8Aoq2GmBBzEhAavUrDZc8iZp317dRfABe8UgEKyuEcTLS5jPn6B2uere1s4gh1wLSYYtQcZjnNcctTGzRi656dZhVitofvq</code>
+                        </div>
+                        <p class="address-hint">XMR · Feather Wallet oder jeder andere Monero-Client</p>
+                    </div>
+                    <div class="donate-card">
+                        <div class="coin-header">
+                            <span class="coin-icon">Ł</span>
+                            <div>
+                                <h3>Litecoin (LTC)</h3>
+                                <span class="coin-badge ltc">Schnell &amp; günstig</span>
+                            </div>
+                        </div>
+                        <p class="coin-desc">Litecoin bietet schnelle Transaktionen mit niedrigen Gebühren.</p>
+                        <div class="address-box">
+                            <code>ltc1qk39sfajmyms3gsem0jk6awz7qqlmh74xktmq05</code>
+                        </div>
+                        <p class="address-hint">LTC · Electrum-LTC oder jeder andere Litecoin-Client</p>
+                    </div>
+                </div>
+                <p class="donate-note">
+                    Spenden sind vollständig freiwillig. Es gibt keine Gegenleistung und keinen Account-Vorteil.
+                    Bei Fragen: <a href="mailto:admin@acidbrns.cc">admin@acidbrns.cc</a>
+                </p>
+            </section>
+
+            <!-- Statistiken -->
+            <section class="stats-section">
+                <h3>Server-Statistiken</h3>
+                <div class="stats-grid">
+                    <div class="stat">
+                        <span class="stat-number">{{ stats.total_users }}</span>
+                        <span class="stat-label">Registrierte User</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">{{ stats.registrations_today }}</span>
+                        <span class="stat-label">Heute registriert</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 acidbrns.cc |
+                <a href="/account">Account</a> |
+                <a href="/reset">Passwort vergessen</a> |
+                <a href="/datenschutz.html">Datenschutz</a> |
+                <a href="/onion.html">🧅 Tor Onion</a>
+            </p>
+            <p class="tech-info">
+                Powered by <a href="https://prosody.im" target="_blank" rel="noopener">Prosody</a> |
+                OMEMO verschlüsselt 🔒 |
+                <a href="https://github.com/acidboonrs" target="_blank" rel="noopener">GitHub</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

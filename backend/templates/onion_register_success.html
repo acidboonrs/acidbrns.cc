@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Account erstellt — XMPP @ acidbrns.cc</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✅ Account erfolgreich erstellt</h1>
+        </header>
+        <main>
+            <section class="success-card">
+                <div class="jid-display">
+                    <p>Deine XMPP-Adresse (JID):</p>
+                    <div class="jid-box">
+                        <code style="user-select:all;font-size:1.1rem;font-family:monospace">{{ jid }}</code>
+                    </div>
+                    <p class="help-text" style="margin-top:.5rem">
+                        Markiere die JID und kopiere sie mit Strg+C.
+                    </p>
+                </div>
+
+                <div class="next-steps">
+                    <h3>Nächste Schritte</h3>
+                    <ol>
+                        <li>XMPP-Client installieren (siehe unten)</li>
+                        <li>Neuen Account hinzufügen mit <code>{{ jid }}</code> und deinem Passwort</li>
+                        <li>OMEMO-Verschlüsselung in den Einstellungen aktivieren</li>
+                        <li>Kontakte hinzufügen und sicher chatten</li>
+                    </ol>
+                </div>
+
+                <div class="clients">
+                    <h3>Empfohlene Clients</h3>
+                    <ul>
+                        <li><strong>Android:</strong> Conversations (F-Droid / Play Store)</li>
+                        <li><strong>iOS:</strong> Siskin IM, Monal</li>
+                        <li><strong>Desktop:</strong> Gajim, Dino (Linux), Beagle IM (macOS)</li>
+                    </ul>
+                </div>
+
+                <div class="info-notice" style="margin-top:1.5rem">
+                    <strong>📌 Tor-Empfehlung:</strong>
+                    Konfiguriere den Client so, dass er sich über Tor (Orbot) zum Server verbindet.
+                    So bleibt deine IP auch dem Server verborgen.
+                </div>
+
+                <p style="margin-top:1.5rem">
+                    <a href="/">← Zurück zur Startseite</a>
+                </p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

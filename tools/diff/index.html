@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Text Diff – zwei Texte vergleichen und Unterschiede hervorheben">
+    <meta name="theme-color" content="#00ff88">
+    <title>Text Diff – tools.acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #09090b; --bg-secondary: #0f0f12; --bg-card: #131316; --text-primary: #fafafa; --text-secondary: #71717a; --text-muted: #52525b; --accent: #00ff88; --accent-glow: rgba(0,255,136,0.15); --border: #27272a; --red: #ff4444; --red-glow: rgba(255,68,68,0.12); --green-glow: rgba(0,255,136,0.12); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .page-header { margin-bottom: 2rem; }
+        .page-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .page-desc { color: var(--text-secondary); font-size: 0.9375rem; }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .panel-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
+        textarea { width: 100%; height: 250px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; resize: vertical; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: var(--accent); }
+        .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .btn { padding: 0.625rem 1.25rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .btn-primary { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .btn-secondary { color: var(--text-secondary); }
+        .status { padding: 0.5rem 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; display: none; margin-bottom: 1rem; }
+        .status.ok { background: var(--accent-glow); border: 1px solid rgba(0,255,136,0.2); color: var(--accent); display: block; }
+        .status.info { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); display: block; }
+        .diff-output { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; }
+        .diff-header { padding: 0.875rem 1.25rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; gap: 2rem; }
+        .diff-stat { font-size: 0.8125rem; color: var(--text-muted); }
+        .diff-stat .added { color: var(--accent); }
+        .diff-stat .removed { color: var(--red); }
+        .diff-line { display: flex; }
+        .diff-ln { width: 48px; padding: 0 0.75rem; color: var(--text-muted); font-size: 0.75rem; text-align: right; user-select: none; border-right: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; }
+        .diff-sign { width: 24px; padding: 0 0.5rem; flex-shrink: 0; display: flex; align-items: center; }
+        .diff-content { padding: 0.25rem 0.75rem; flex: 1; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
+        .diff-line.added { background: var(--green-glow); }
+        .diff-line.added .diff-sign { color: var(--accent); }
+        .diff-line.added .diff-ln { color: rgba(0,255,136,0.4); }
+        .diff-line.removed { background: var(--red-glow); }
+        .diff-line.removed .diff-sign { color: var(--red); }
+        .diff-line.removed .diff-ln { color: rgba(255,68,68,0.4); }
+        .diff-line.unchanged .diff-content { color: var(--text-secondary); }
+        .diff-line.context-sep { background: var(--bg-secondary); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .diff-line.context-sep .diff-content { color: var(--text-muted); font-size: 0.75rem; }
+        .legend { display: flex; gap: 1.5rem; margin-bottom: 1rem; }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 768px) { .editor-layout { grid-template-columns: 1fr; } .footer-content { flex-direction: column; gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="https://tools.acidbrns.cc" class="back-link" title="Zurück zu Tools">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                </a>
+                <a href="https://tools.acidbrns.cc" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>tools<span class="logo-divider">/</span>diff</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Text Diff</h1>
+                <p class="page-desc">Zwei Texte vergleichen und Unterschiede zeilenweise hervorheben. Alles läuft lokal im Browser.</p>
+            </div>
+
+            <div class="editor-layout">
+                <div>
+                    <span class="panel-label">Original (A)</span>
+                    <textarea id="textA" placeholder="Original-Text eingeben..."></textarea>
+                </div>
+                <div>
+                    <span class="panel-label">Geändert (B)</span>
+                    <textarea id="textB" placeholder="Geänderten Text eingeben..."></textarea>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="runDiff()">Vergleichen</button>
+                <button class="btn btn-secondary" onclick="clearAll()">✕ Leeren</button>
+                <button class="btn btn-secondary" onclick="swapTexts()">↕ Tauschen</button>
+            </div>
+
+            <div id="status" class="status"></div>
+            <div id="diffOutput" style="display:none">
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--green-glow);border:1px solid rgba(0,255,136,0.3)"></div>Hinzugefügt</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--red-glow);border:1px solid rgba(255,68,68,0.3)"></div>Entfernt</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--bg-card);border:1px solid var(--border)"></div>Unverändert</div>
+                </div>
+                <div class="diff-output">
+                    <div class="diff-header">
+                        <span class="diff-stat">+<span class="added" id="addedCount">0</span> hinzugefügt</span>
+                        <span class="diff-stat">-<span class="removed" id="removedCount">0</span> entfernt</span>
+                        <span class="diff-stat" id="unchangedStat"></span>
+                    </div>
+                    <div id="diffLines"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© 2026 acidbrns.cc</p>
+                <div class="footer-links"><a href="https://tools.acidbrns.cc">Alle Tools</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
+
+        function escHtml(s) {
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        // LCS-based line diff
+        function lcs(a, b) {
+            const m = a.length, n = b.length;
+            const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+            for (let i = 1; i <= m; i++)
+                for (let j = 1; j <= n; j++)
+                    dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+
+            const result = [];
+            let i = m, j = n;
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && a[i-1] === b[j-1]) {
+                    result.unshift({type:'equal', line: a[i-1], ln_a: i, ln_b: j});
+                    i--; j--;
+                } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+                    result.unshift({type:'added', line: b[j-1], ln_b: j});
+                    j--;
+                } else {
+                    result.unshift({type:'removed', line: a[i-1], ln_a: i});
+                    i--;
+                }
+            }
+            return result;
+        }
+
+        function runDiff() {
+            const a = document.getElementById('textA').value;
+            const b = document.getElementById('textB').value;
+            if (!a && !b) return;
+
+            const linesA = a.split('\n');
+            const linesB = b.split('\n');
+            const diff = lcs(linesA, linesB);
+
+            let added = 0, removed = 0, unchanged = 0;
+            const CONTEXT = 3;
+
+            // Find lines to show (context around changes)
+            const changed = diff.map((d,i) => d.type !== 'equal');
+            const show = new Set();
+            for (let i = 0; i < diff.length; i++) {
+                if (changed[i]) {
+                    for (let j = Math.max(0,i-CONTEXT); j <= Math.min(diff.length-1,i+CONTEXT); j++) show.add(j);
+                }
+            }
+
+            let html = '';
+            let lastShown = -1;
+            for (let i = 0; i < diff.length; i++) {
+                const d = diff[i];
+                if (d.type === 'added') added++;
+                else if (d.type === 'removed') removed++;
+                else unchanged++;
+
+                if (!show.has(i)) continue;
+                if (lastShown !== -1 && i > lastShown + 1) {
+                    html += `<div class="diff-line context-sep"><div class="diff-sign"></div><div class="diff-content">@@ ${i - lastShown - 1} Zeilen ausgeblendet @@</div></div>`;
+                }
+                lastShown = i;
+
+                const ln = d.type === 'added' ? (d.ln_b || '') :
+                           d.type === 'removed' ? (d.ln_a || '') :
+                           (d.ln_a || '');
+                const sign = d.type === 'added' ? '+' : d.type === 'removed' ? '−' : '';
+                html += `<div class="diff-line ${d.type}">
+                    <div class="diff-ln">${ln}</div>
+                    <div class="diff-sign">${sign}</div>
+                    <div class="diff-content">${escHtml(d.line)}</div>
+                </div>`;
+            }
+
+            document.getElementById('addedCount').textContent = added;
+            document.getElementById('removedCount').textContent = removed;
+            document.getElementById('unchangedStat').textContent = unchanged + ' unverändert';
+            document.getElementById('diffLines').innerHTML = html;
+            document.getElementById('diffOutput').style.display = 'block';
+
+            const status = document.getElementById('status');
+            if (added === 0 && removed === 0) {
+                status.textContent = 'Die Texte sind identisch.';
+                status.className = 'status info';
+            } else {
+                status.textContent = 'Vergleich abgeschlossen: +' + added + ' / −' + removed;
+                status.className = 'status ok';
+                setTimeout(() => { status.className = 'status'; }, 3000);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('textA').value = '';
+            document.getElementById('textB').value = '';
+            document.getElementById('diffOutput').style.display = 'none';
+            document.getElementById('status').className = 'status';
+        }
+
+        function swapTexts() {
+            const a = document.getElementById('textA');
+            const b = document.getElementById('textB');
+            const tmp = a.value;
+            a.value = b.value;
+            b.value = tmp;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DNS Lookup – DNS-Records für Domains abfragen via Cloudflare DoH">
+    <meta name="theme-color" content="#00ff88">
+    <title>DNS Lookup – tools.acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #09090b; --bg-secondary: #0f0f12; --bg-card: #131316; --text-primary: #fafafa; --text-secondary: #71717a; --text-muted: #52525b; --accent: #00ff88; --accent-glow: rgba(0,255,136,0.15); --border: #27272a; --red: #ff4444; --red-glow: rgba(255,68,68,0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .page-header { margin-bottom: 2rem; }
+        .page-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .page-desc { color: var(--text-secondary); font-size: 0.9375rem; }
+        .search-row { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+        .domain-input { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.9375rem; outline: none; transition: border-color 0.2s; }
+        .domain-input:focus { border-color: var(--accent); }
+        .btn { padding: 0.75rem 1.25rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+        .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .btn-primary { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .type-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .type-btn { padding: 0.375rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s; }
+        .type-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .status { padding: 0.5rem 0.75rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; display: none; margin-bottom: 1rem; }
+        .status.ok { background: var(--accent-glow); border: 1px solid rgba(0,255,136,0.2); color: var(--accent); display: block; }
+        .status.err { background: var(--red-glow); border: 1px solid rgba(255,68,68,0.2); color: var(--red); display: block; }
+        .results { display: flex; flex-direction: column; gap: 1.5rem; }
+        .record-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .record-group-header { display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--bg-secondary); }
+        .record-type { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 600; color: var(--accent); }
+        .record-count { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); }
+        .record-row { padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; gap: 1rem; align-items: flex-start; }
+        .record-row:last-child { border-bottom: none; }
+        .record-ttl { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); min-width: 70px; padding-top: 2px; }
+        .record-data { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: var(--text-primary); flex: 1; word-break: break-all; }
+        .no-records { padding: 1.5rem; text-align: center; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 640px) { .search-row { flex-direction: column; } .footer-content { flex-direction: column; gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="https://tools.acidbrns.cc" class="back-link" title="Zurück zu Tools">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                </a>
+                <a href="https://tools.acidbrns.cc" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>tools<span class="logo-divider">/</span>dns</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">DNS Lookup</h1>
+                <p class="page-desc">DNS-Records für jede Domain abfragen. Nutzt Cloudflare DNS-over-HTTPS (1.1.1.1) – verschlüsselt, kein ISP-Sniffing.</p>
+            </div>
+
+            <div class="search-row">
+                <input type="text" class="domain-input" id="domain" placeholder="acidbrns.cc" onkeydown="if(event.key==='Enter')lookup()">
+                <button class="btn btn-primary" onclick="lookup()">Abfragen</button>
+            </div>
+
+            <div class="type-grid" id="typeGrid">
+                <button class="type-btn active" data-type="ALL" onclick="selectType(this)">ALL</button>
+                <button class="type-btn" data-type="A" onclick="selectType(this)">A</button>
+                <button class="type-btn" data-type="AAAA" onclick="selectType(this)">AAAA</button>
+                <button class="type-btn" data-type="MX" onclick="selectType(this)">MX</button>
+                <button class="type-btn" data-type="TXT" onclick="selectType(this)">TXT</button>
+                <button class="type-btn" data-type="CNAME" onclick="selectType(this)">CNAME</button>
+                <button class="type-btn" data-type="NS" onclick="selectType(this)">NS</button>
+                <button class="type-btn" data-type="SOA" onclick="selectType(this)">SOA</button>
+                <button class="type-btn" data-type="SRV" onclick="selectType(this)">SRV</button>
+                <button class="type-btn" data-type="CAA" onclick="selectType(this)">CAA</button>
+            </div>
+
+            <div id="status" class="status"></div>
+            <div class="results" id="results"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">© 2026 acidbrns.cc</p>
+                <div class="footer-links"><a href="https://tools.acidbrns.cc">Alle Tools</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
+        let selectedType = 'ALL';
+
+        const TYPES = ['A','AAAA','MX','TXT','CNAME','NS','SOA','SRV','CAA'];
+        const TYPE_NAMES = {1:'A',2:'NS',5:'CNAME',6:'SOA',12:'PTR',15:'MX',16:'TXT',28:'AAAA',33:'SRV',257:'CAA'};
+
+        function selectType(btn) {
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedType = btn.dataset.type;
+        }
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = 'status ' + type;
+            if (type === 'ok') setTimeout(() => { el.className = 'status'; }, 3000);
+        }
+
+        function formatTTL(ttl) {
+            if (ttl >= 3600) return (ttl/3600).toFixed(0) + 'h';
+            if (ttl >= 60) return (ttl/60).toFixed(0) + 'm';
+            return ttl + 's';
+        }
+
+        function formatData(record) {
+            switch(record.type) {
+                case 1: case 28: return record.data;
+                case 15: return record.data; // MX includes priority
+                case 16: return record.data.replace(/^"|"$/g,'');
+                case 5: return record.data;
+                case 6: return record.data;
+                case 2: return record.data;
+                case 33: return record.data;
+                case 257: return record.data;
+                default: return record.data || JSON.stringify(record);
+            }
+        }
+
+        async function queryType(domain, type) {
+            const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`;
+            const res = await fetch(url, { headers: { 'Accept': 'application/dns-json' } });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            return data.Answer || [];
+        }
+
+        async function lookup() {
+            let domain = document.getElementById('domain').value.trim().toLowerCase();
+            domain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+            if (!domain) return showStatus('Bitte Domain eingeben.', 'err');
+
+            document.getElementById('results').innerHTML = '';
+            showStatus('Abfrage läuft...', 'ok');
+
+            try {
+                const typesToQuery = selectedType === 'ALL' ? TYPES : [selectedType];
+                const queries = typesToQuery.map(t => queryType(domain, t).catch(() => []));
+                const results = await Promise.all(queries);
+                const allRecords = results.flat();
+
+                document.getElementById('status').className = 'status';
+
+                if (allRecords.length === 0) {
+                    showStatus('Keine DNS-Records gefunden für ' + domain, 'err');
+                    return;
+                }
+
+                // Group by type
+                const grouped = {};
+                for (const record of allRecords) {
+                    const typeName = TYPE_NAMES[record.type] || 'TYPE' + record.type;
+                    if (!grouped[typeName]) grouped[typeName] = [];
+                    grouped[typeName].push(record);
+                }
+
+                const resultsEl = document.getElementById('results');
+                for (const [type, records] of Object.entries(grouped)) {
+                    const group = document.createElement('div');
+                    group.className = 'record-group';
+                    group.innerHTML = `
+                        <div class="record-group-header">
+                            <span class="record-type">${type}</span>
+                            <span class="record-count">${records.length} Record${records.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        ${records.map(r => `
+                            <div class="record-row">
+                                <span class="record-ttl">${formatTTL(r.TTL)}</span>
+                                <span class="record-data">${escHtml(formatData(r))}</span>
+                            </div>`).join('')}`;
+                    resultsEl.appendChild(group);
+                }
+
+                showStatus('Abfrage abgeschlossen: ' + allRecords.length + ' Records für ' + domain, 'ok');
+            } catch(e) {
+                showStatus('Fehler: ' + e.message, 'err');
+            }
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Eine Anleitung zur Absicherung deines Servers mit Fail2Ban – von der Installation bis zu benutzerdefinierten Jails.">
+    <title>Fail2Ban richtig konfigurieren – acidbrns.cc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #0f0f12;
+            --bg-card: #131316;
+            --text-primary: #fafafa;
+            --text-secondary: #71717a;
+            --text-muted: #52525b;
+            --accent: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.15);
+            --border: #27272a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 1000; }
+        .container { max-width: 720px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; align-items: center; justify-content: space-between; }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .back-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s ease; }
+        .back-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+        .back-link svg { width: 18px; height: 18px; }
+        .logo { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .logo-accent { color: var(--accent); }
+        .logo-divider { color: var(--text-muted); font-weight: 400; }
+        main { flex: 1; padding: 3rem 0; }
+        .post-header { margin-bottom: 2.5rem; }
+        .post-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .post-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 500; color: var(--accent); background: var(--accent-glow); padding: 0.25rem 0.5rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .post-title { font-size: 2rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.75rem; }
+        .post-desc { color: var(--text-secondary); font-size: 1.0625rem; }
+        .post-content { font-size: 1rem; line-height: 1.8; color: var(--text-secondary); }
+        .post-content h2 { color: var(--text-primary); font-size: 1.375rem; margin: 2.5rem 0 1rem; }
+        .post-content h3 { color: var(--text-primary); font-size: 1.125rem; margin: 2rem 0 0.75rem; }
+        .post-content p { margin-bottom: 1.25rem; }
+        .post-content ul, .post-content ol { margin: 0 0 1.25rem 1.5rem; }
+        .post-content li { margin-bottom: 0.5rem; }
+        .post-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; background: var(--bg-card); border: 1px solid var(--border); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--accent); }
+        .post-content pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; overflow-x: auto; }
+        .post-content pre code { background: none; border: none; padding: 0; font-size: 0.8125rem; color: var(--text-primary); }
+        .post-content strong { color: var(--text-primary); }
+        .post-content a { color: var(--accent); text-decoration: none; }
+        .post-content a:hover { text-decoration: underline; }
+        .post-content blockquote { border-left: 3px solid var(--accent); padding: 0.75rem 1.25rem; margin: 1.25rem 0; background: var(--accent-glow); border-radius: 0 8px 8px 0; }
+        .post-content blockquote p { margin-bottom: 0; color: var(--text-primary); }
+        .post-nav { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .post-nav a { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+        .post-nav a:hover { text-decoration: underline; }
+        footer { border-top: 1px solid var(--border); padding: 1.5rem 0; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; color: var(--text-muted); }
+        .footer-links { display: flex; gap: 1rem; }
+        .footer-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent); }
+        @media (max-width: 640px) { .post-title { font-size: 1.5rem; } .header-content { flex-direction: column; align-items: flex-start; } .footer-content { flex-direction: column; gap: 1rem; text-align: center; } }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/" class="back-link" title="Zurück zum Blog">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                    </a>
+                    <a href="/" class="logo"><span class="logo-accent">&gt;</span>acidbrns<span class="logo-divider">/</span>blog</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <div class="post-header">
+                <div class="post-meta">
+                    <span class="post-date">2026-01-15</span>
+                    <span class="post-tag">Linux</span>
+                </div>
+                <h1 class="post-title">Fail2Ban richtig konfigurieren</h1>
+                <p class="post-desc">Eine Anleitung zur Absicherung deines Servers mit Fail2Ban – von der Installation bis zu benutzerdefinierten Jails.</p>
+            </div>
+            <div class="post-content">
+
+                <h2>Was ist Fail2Ban?</h2>
+
+                <p>Fail2Ban ist ein in Python geschriebener Daemon, der Logdateien auf fehlgeschlagene Authentifizierungsversuche überwacht und bei wiederholten Fehlversuchen die Quell-IP automatisch sperrt. Es arbeitet regelbasiert: Sobald eine konfigurierbare Anzahl an Fehlversuchen innerhalb eines Zeitfensters erkannt wird, wird eine Firewall-Regel erstellt, die den Angreifer für eine bestimmte Dauer blockiert.</p>
+
+                <p>Ohne Fail2Ban steht dein SSH-Port offen für Brute-Force-Angriffe. In der Praxis sieht man in <code>/var/log/auth.log</code> oft tausende Login-Versuche pro Tag von automatisierten Bots. Fail2Ban reduziert diese Angriffsfläche drastisch.</p>
+
+                <h2>Installation auf Debian/Ubuntu</h2>
+
+                <p>Die Installation ist unkompliziert:</p>
+
+<pre><code>sudo apt update
+sudo apt install fail2ban -y</code></pre>
+
+                <p>Nach der Installation läuft Fail2Ban als systemd-Service. Überprüfe den Status:</p>
+
+<pre><code>sudo systemctl status fail2ban
+sudo systemctl enable fail2ban</code></pre>
+
+                <blockquote><p>Wichtig: Bearbeite niemals die Dateien <code>/etc/fail2ban/jail.conf</code> oder <code>/etc/fail2ban/fail2ban.conf</code> direkt. Diese werden bei Updates überschrieben. Nutze stattdessen immer <code>/etc/fail2ban/jail.local</code> bzw. Dateien unter <code>/etc/fail2ban/jail.d/</code>.</p></blockquote>
+
+                <h2>Wie Jails funktionieren</h2>
+
+                <p>Ein <strong>Jail</strong> ist die zentrale Konfigurationseinheit in Fail2Ban. Jedes Jail besteht aus drei Komponenten:</p>
+
+                <ul>
+                    <li><strong>Filter</strong> – Ein regulärer Ausdruck, der fehlgeschlagene Login-Versuche in der Logdatei erkennt.</li>
+                    <li><strong>Logpfad</strong> – Die Datei, die überwacht wird (z.B. <code>/var/log/auth.log</code>).</li>
+                    <li><strong>Action</strong> – Was bei einer Sperre passiert, typischerweise eine Firewall-Regel.</li>
+                </ul>
+
+                <p>Die Standardkonfiguration in <code>jail.conf</code> enthält bereits vordefinierte Jails für viele Dienste. Allerdings sind die meisten standardmäßig deaktiviert – du musst sie explizit in deiner <code>jail.local</code> aktivieren.</p>
+
+                <h2>SSH-Jail konfigurieren</h2>
+
+                <p>Erstelle die lokale Konfigurationsdatei:</p>
+
+<pre><code>sudo nano /etc/fail2ban/jail.local</code></pre>
+
+                <p>Füge folgende Konfiguration ein:</p>
+
+<pre><code>[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+banaction = iptables-multiport
+ignoreip = 127.0.0.1/8 ::1
+
+[sshd]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 3
+bantime  = 24h</code></pre>
+
+                <p>Die Parameter im Detail:</p>
+
+                <ul>
+                    <li><code>maxretry</code> – Anzahl der erlaubten Fehlversuche, bevor die IP gebannt wird.</li>
+                    <li><code>findtime</code> – Zeitfenster, in dem die Fehlversuche gezählt werden.</li>
+                    <li><code>bantime</code> – Dauer der Sperre. Unterstützt Suffixe wie <code>m</code> (Minuten), <code>h</code> (Stunden), <code>d</code> (Tage). Der Wert <code>-1</code> sperrt permanent.</li>
+                </ul>
+
+                <p>Nach jeder Änderung muss Fail2Ban neu geladen werden:</p>
+
+<pre><code>sudo systemctl restart fail2ban</code></pre>
+
+                <h2>Benutzerdefinierte Jails erstellen</h2>
+
+                <h3>Nginx-Jail gegen HTTP-Brute-Force</h3>
+
+                <p>Erstelle zuerst den Filter unter <code>/etc/fail2ban/filter.d/nginx-auth.conf</code>:</p>
+
+<pre><code>[Definition]
+failregex = no user/password was provided for basic authentication.*client: &lt;HOST&gt;
+            user .* was not found in ".*":.*client: &lt;HOST&gt;
+            user .* password mismatch.*client: &lt;HOST&gt;
+ignoreregex =</code></pre>
+
+                <p>Dann das Jail in <code>/etc/fail2ban/jail.local</code> hinzufügen:</p>
+
+<pre><code>[nginx-auth]
+enabled  = true
+port     = http,https
+filter   = nginx-auth
+logpath  = /var/log/nginx/error.log
+maxretry = 5
+bantime  = 2h
+findtime = 10m</code></pre>
+
+                <h3>Prosody-Jail für XMPP-Server</h3>
+
+                <p>Wer einen Prosody-XMPP-Server betreibt, kennt das Problem: Bots versuchen sich permanent mit zufälligen Credentials anzumelden. Erstelle den Filter <code>/etc/fail2ban/filter.d/prosody-auth.conf</code>:</p>
+
+<pre><code>[Definition]
+failregex = Failed authentication attempt \(not-authorized\) for user .* from IP: &lt;HOST&gt;
+ignoreregex =</code></pre>
+
+                <p>Und das zugehörige Jail:</p>
+
+<pre><code>[prosody-auth]
+enabled  = true
+port     = 5222,5223,5269
+filter   = prosody-auth
+logpath  = /var/log/prosody/prosody.log
+maxretry = 5
+bantime  = 6h
+findtime = 10m</code></pre>
+
+                <blockquote><p>Hinweis: Damit Prosody die IP-Adressen in das Log schreibt, muss in der Prosody-Konfiguration das entsprechende Logging aktiviert sein. Prüfe <code>log = { info = "/var/log/prosody/prosody.log" }</code> in deiner <code>prosody.cfg.lua</code>.</p></blockquote>
+
+                <h2>Monitoring mit fail2ban-client</h2>
+
+                <p>Fail2Ban bringt ein mächtiges CLI-Tool mit. Hier die wichtigsten Befehle:</p>
+
+<pre><code># Gesamtstatus aller Jails anzeigen
+sudo fail2ban-client status
+
+# Status eines bestimmten Jails
+sudo fail2ban-client status sshd
+
+# Eine IP manuell entbannen
+sudo fail2ban-client set sshd unbanip 203.0.113.42
+
+# Eine IP manuell bannen
+sudo fail2ban-client set sshd banip 198.51.100.10
+
+# Alle gebannten IPs eines Jails auflisten
+sudo fail2ban-client get sshd banip --with-time</code></pre>
+
+                <p>Die Ausgabe von <code>fail2ban-client status sshd</code> zeigt dir die aktuelle Anzahl der gebannten IPs, die überwachte Logdatei und die Gesamtanzahl der erkannten Fehlversuche. Das ist besonders nützlich, um zu prüfen, ob deine Filter korrekt greifen.</p>
+
+                <h2>Banzeiten und Findtime tunen</h2>
+
+                <p>Die richtige Balance zwischen Sicherheit und Benutzerfreundlichkeit ist entscheidend. Hier einige bewährte Strategien:</p>
+
+                <p><strong>Progressive Banzeiten</strong> lassen sich über die <code>bantime.increment</code>-Option realisieren. Wiederholungstäter werden damit exponentiell länger gesperrt:</p>
+
+<pre><code>[DEFAULT]
+bantime           = 1h
+bantime.increment = true
+bantime.factor    = 24
+bantime.formula   = ban.Time * math.exp(float(ban.Count+1)*banFactor)/math.exp(1*banFactor)
+bantime.maxtime   = 4w</code></pre>
+
+                <p>Mit dieser Konfiguration wird die Banzeit bei jedem weiteren Vergehen multipliziert – beim ersten Ban 1 Stunde, beim zweiten bereits 24 Stunden, und so weiter bis maximal 4 Wochen. Persistente Angreifer werden so effektiv ausgesperrt.</p>
+
+                <p>Für <code>findtime</code> empfehle ich einen Wert zwischen 10 und 30 Minuten. Ein zu kurzes Zeitfenster lässt langsame Brute-Force-Angriffe durch, ein zu langes erzeugt Fehlalarme bei legitimen Nutzern.</p>
+
+                <h2>IPs whitelisten</h2>
+
+                <p>Die Option <code>ignoreip</code> im <code>[DEFAULT]</code>-Block schützt bestimmte IPs vor Bans. Das ist unverzichtbar, um sich nicht selbst auszusperren:</p>
+
+<pre><code>[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1 192.168.1.0/24 10.0.0.0/8 2001:db8::/32</code></pre>
+
+                <p>Du kannst auch ganze Subnetze und IPv6-Adressen angeben. Trage hier auf jeden Fall deine eigene statische IP ein, falls du eine hast. Für dynamische IPs bietet sich ein VPN als Zwischenschritt an.</p>
+
+                <h2>Integration mit iptables und nftables</h2>
+
+                <p>Fail2Ban unterstützt verschiedene Firewall-Backends. Standardmäßig wird <code>iptables</code> verwendet. Die Action bestimmt, wie Bans umgesetzt werden:</p>
+
+<pre><code># In /etc/fail2ban/jail.local
+
+# Für iptables (Standard)
+[DEFAULT]
+banaction = iptables-multiport
+
+# Für nftables (moderner)
+[DEFAULT]
+banaction = nftables-multiport</code></pre>
+
+                <p>Wer bereits auf <code>nftables</code> migriert hat, sollte unbedingt die <code>banaction</code> umstellen. Fail2Ban erstellt dann automatisch die passenden nftables-Regeln. Prüfe die aktiven Regeln mit:</p>
+
+<pre><code># iptables-Regeln anzeigen
+sudo iptables -L f2b-sshd -n -v
+
+# nftables-Regeln anzeigen
+sudo nft list ruleset | grep -A 5 f2b</code></pre>
+
+                <p>Für eine vollständige Lösung kannst du Fail2Ban auch mit E-Mail-Benachrichtigungen kombinieren. Setze dafür die Action auf <code>%(action_mwl)s</code>, was den Ban ausführt, eine Mail mit Whois-Informationen und den relevanten Logzeilen verschickt:</p>
+
+<pre><code>[sshd]
+enabled  = true
+action   = %(action_mwl)s
+maxretry = 3</code></pre>
+
+                <h2>Zusammenfassung</h2>
+
+                <p>Fail2Ban ist eines der einfachsten und effektivsten Werkzeuge zur Absicherung eines Linux-Servers. Die wichtigsten Punkte:</p>
+
+                <ul>
+                    <li>Immer <code>jail.local</code> statt <code>jail.conf</code> bearbeiten.</li>
+                    <li>SSH-Jail mit niedrigem <code>maxretry</code> und langer <code>bantime</code> konfigurieren.</li>
+                    <li>Eigene Filter für Dienste wie Nginx, Prosody oder andere Anwendungen erstellen.</li>
+                    <li>Progressive Banzeiten aktivieren, um Wiederholungstäter auszusperren.</li>
+                    <li>Eigene IPs immer in <code>ignoreip</code> aufnehmen.</li>
+                    <li>Regelmäßig mit <code>fail2ban-client status</code> den Zustand prüfen.</li>
+                </ul>
+
+                <p>Fail2Ban ersetzt keine sichere SSH-Konfiguration (Key-Only-Auth, Port-Änderung) und keine Firewall. Es ist eine zusätzliche Verteidigungslinie, die automatisierte Angriffe zuverlässig abwehrt.</p>
+
+            </div>
+            <div class="post-nav">
+                <a href="/">&#8592; Zurück zum Blog</a>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p class="copyright">&copy; 2026 acidbrns.cc</p>
+                <div class="footer-links">
+                    <a href="https://acidbrns.cc">Hauptseite</a>
+                    <a href="/">Blog</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Registrierung fehlgeschlagen — XMPP @ acidbrns.cc</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚠️ Registrierung fehlgeschlagen</h1>
+        </header>
+        <main>
+            <section class="form-section">
+                <div class="message-box error" style="display:block">
+                    <strong>Folgende Probleme sind aufgetreten:</strong>
+                    <ul>
+                        {% for err in errors %}
+                        <li>{{ err }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <p>Du kannst es erneut versuchen — deine Eingaben wurden vorausgefüllt
+                   (Passwörter aus Sicherheitsgründen nicht).</p>
+
+                <form method="POST" action="/api/onion/register" autocomplete="off">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username"
+                               value="{{ username }}"
+                               required minlength="3" maxlength="32"
+                               pattern="[a-z0-9_-]+"
+                               autocomplete="off">
+                        <small class="help-text">3–32 Zeichen, Kleinbuchstaben/Zahlen/-/_</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email <small>(optional, nur für Recovery)</small></label>
+                        <input type="email" id="email" name="email"
+                               value="{{ email }}" maxlength="254"
+                               autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Passwort</label>
+                        <input type="password" id="password" name="password"
+                               required minlength="12" maxlength="128"
+                               autocomplete="new-password">
+                        <small class="help-text">≥12 Zeichen mit Groß-, Klein-, Zahlen und Sonderzeichen</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2">Passwort wiederholen</label>
+                        <input type="password" id="password2" name="password2"
+                               required minlength="12" maxlength="128"
+                               autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" name="privacy" required>
+                            Ich akzeptiere die <a href="/datenschutz.html">Datenschutzerklärung</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Account erstellen 🚀</button>
+                </form>
+
+                <p style="margin-top:1rem"><a href="/">← Startseite</a></p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
