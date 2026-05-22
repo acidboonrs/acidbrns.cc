@@ -4,6 +4,10 @@ Komplettes System zur Erstellung und Verwaltung von XMPP-Accounts mit moderner W
 
 **✨ Speziell konfiguriert für: acidbrns.cc mit Cloudflare DNS**
 
+> 🏛️ **Architektur & Security-Design:** siehe [ARCHITECTURE.md](ARCHITECTURE.md)
+> — Defense-in-Depth, Edge-Proxy + verschlüsselter Tunnel, self-hosted Bot-Schutz,
+> JavaScript-freies, datenschutzfokussiertes Design.
+
 ## 🎯 Quick Start
 
 **Lies QUICKSTART.md für die 5-Schritte-Anleitung!**
@@ -26,7 +30,7 @@ Oder für Cloudflare-Details: **docs/CLOUDFLARE_SETUP.md**
 
 ## 🖥️ Systemanforderungen
 
-- **Hardware**: Raspberry Pi 5 (8GB empfohlen) oder ähnlich
+- **Hardware**: beliebiger Linux-Server (ab ~2 GB RAM)
 - **Betriebssystem**: Ubuntu Server 22.04/24.04 LTS
 - **Domain**: Eigene Domain mit DNS-Zugriff
 - **Ports**: 80, 443, 5222, 5269, 5280 müssen erreichbar sein
@@ -43,7 +47,7 @@ Oder für Cloudflare-Details: **docs/CLOUDFLARE_SETUP.md**
 
 ### Schritt 1: Domain vorbereiten
 
-**Wichtig**: Bevor du installierst, stelle sicher, dass deine Domain auf deinen Raspberry Pi zeigt!
+**Wichtig**: Bevor du installierst, stelle sicher, dass deine Domain auf deinen Server zeigt!
 
 Bei deinem Domain-Anbieter (z.B. Cloudflare, Namecheap):
 ```
@@ -58,7 +62,7 @@ curl ifconfig.me
 
 ### Schritt 2: Dateien hochladen
 
-Alle Projekt-Dateien auf deinen Pi kopieren:
+Alle Projekt-Dateien auf deinen Server kopieren:
 ```bash
 # Auf deinem Computer: Dateien per SCP hochladen
 scp -r xmpp-project/ benutzer@dein-pi:/home/benutzer/
@@ -70,7 +74,7 @@ scp -r xmpp-project/ benutzer@dein-pi:/home/benutzer/
 ### Schritt 3: Installation starten
 
 ```bash
-# Auf dem Raspberry Pi einloggen
+# Auf dem Server einloggen
 ssh benutzer@dein-pi
 
 # Zum Projekt-Ordner wechseln
@@ -95,7 +99,7 @@ Das Script fragt dich nach:
 - SSL-Zertifikate anfordern
 - Services starten
 
-**Dauer**: Ca. 15-20 Minuten (Pi 5)
+**Dauer**: Ca. 15-20 Minuten
 
 ### Schritt 4: Fertig! 🎉
 
@@ -471,7 +475,7 @@ sudo prosodyctl cert import /etc/letsencrypt/live/DOMAIN/
 **Q: Kann ich mehrere Domains hosten?**
 A: Ja! Füge weitere `VirtualHost` Einträge in prosody.cfg.lua hinzu.
 
-**Q: Wie viele User kann mein Pi 5 verkraften?**
+**Q: Wie viele User kann mein Server verkraften?**
 A: Locker 100-500 aktive User, je nach Nutzung.
 
 **Q: Funktioniert OMEMO out-of-the-box?**
@@ -498,4 +502,4 @@ Bei Fragen oder Problemen:
 
 **Viel Erfolg mit deinem XMPP-Server! 🚀**
 
-Erstellt für Raspberry Pi 5 mit ❤️ und Lemon-Blau 🔵
+Erstellt mit ❤️ und Lemon-Blau 🔵

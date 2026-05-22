@@ -2,10 +2,10 @@
 
 ## ⚡ Installation in 5 Schritten
 
-### 1️⃣ Raspberry Pi IP herausfinden
+### 1️⃣ Server-IP herausfinden
 
 ```bash
-# Auf dem Pi:
+# Auf dem Server:
 curl ifconfig.me
 ```
 
@@ -21,8 +21,8 @@ Notiere die IP! (z.B. `123.45.67.89`)
 
 | Type | Name | IPv4 Address | Proxy Status |
 |------|------|--------------|--------------|
-| A | @ (oder acidbrns.cc) | DEINE-PI-IP | ☁️ DNS only (GRAU!) |
-| A | upload | DEINE-PI-IP | ☁️ DNS only (GRAU!) |
+| A | @ (oder acidbrns.cc) | DEINE-SERVER-IP | ☁️ DNS only (GRAU!) |
+| A | upload | DEINE-SERVER-IP | ☁️ DNS only (GRAU!) |
 
 **⚠️ WICHTIG**: Proxy-Status muss **OFF** sein (graue Cloud)!
 
@@ -32,14 +32,14 @@ Notiere die IP! (z.B. `123.45.67.89`)
 
 **In deinem Router-Admin-Panel** (meist http://192.168.1.1):
 
-Ports freigeben zu deinem Raspberry Pi:
+Ports freigeben zu deinem Server:
 
 ```
-80   → Raspberry Pi IP
-443  → Raspberry Pi IP
-5222 → Raspberry Pi IP
-5269 → Raspberry Pi IP
-5280 → Raspberry Pi IP
+80   → Server-IP
+443  → Server-IP
+5222 → Server-IP
+5269 → Server-IP
+5280 → Server-IP
 ```
 
 ---
@@ -53,19 +53,19 @@ Ports freigeben zu deinem Raspberry Pi:
 ping acidbrns.cc
 ping upload.acidbrns.cc
 
-# Sollte deine Pi-IP zeigen!
+# Sollte deine Server-IP zeigen!
 ```
 
 ---
 
 ### 5️⃣ Installation starten
 
-**Auf dem Raspberry Pi:**
+**Auf dem Server:**
 
 ```bash
 # Falls noch nicht kopiert: ZIP hochladen
-scp xmpp-acidbrns.zip user@pi-ip:/home/user/
-ssh user@pi-ip
+scp xmpp-acidbrns.zip user@server-ip:/home/user/
+ssh user@server-ip
 
 # Entpacken
 unzip xmpp-acidbrns.zip
@@ -141,6 +141,7 @@ sudo tail -f /var/log/prosody/prosody.log
 
 ## 📚 Mehr Hilfe
 
+- **ARCHITECTURE.md** - Architektur & Security-Design (Überblick)
 - **CLOUDFLARE_SETUP.md** - Detaillierte Cloudflare-Anleitung
 - **README.md** - Komplettes Handbuch
 - **DATABASE_GUIDE.md** - Datenbank für Anfänger
@@ -149,7 +150,7 @@ sudo tail -f /var/log/prosody/prosody.log
 
 ## 🎯 Checkliste
 
-- [ ] Pi IP notiert
+- [ ] Server-IP notiert
 - [ ] Cloudflare DNS konfiguriert (Proxy OFF!)
 - [ ] Router Port-Forwarding eingerichtet
 - [ ] `ping acidbrns.cc` funktioniert

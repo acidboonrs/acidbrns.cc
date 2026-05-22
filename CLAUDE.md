@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-XMPP account registration system for **acidbrns.cc** running on a Raspberry Pi 5. Users register via a web form; the backend creates accounts in both PostgreSQL and Prosody simultaneously.
+XMPP account registration system for **acidbrns.cc** running on a Linux host. Users register via a web form; the backend creates accounts in both PostgreSQL and Prosody simultaneously.
 
 ## Architecture
 
