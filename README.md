@@ -11,9 +11,9 @@ JavaScript-free**, with self-hosted bot protection and no third-party trackers.
 🔗 **Live:** [acidbrns.cc](https://acidbrns.cc) · also reachable as a Tor onion service
 📐 **Design:** [Architecture & Security](ARCHITECTURE.md) ([Deutsch](ARCHITECTURE.de.md))
 
-<!-- Add a screenshot of the registration page here, e.g.:
 ![Registration page](docs/screenshot.png)
--->
+
+<sub>JavaScript-free registration UI · [full-page screenshot](docs/screenshot-full.png)</sub>
 
 ## Why it's interesting
 
