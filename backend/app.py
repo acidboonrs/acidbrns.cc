@@ -5,9 +5,8 @@ Flask-App für Account-Registrierung mit PostgreSQL-Integration
 Inkl. selbst gehostetem Bot-Schutz (Mathe-Captcha + Honeypot), serverseitig gerendert
 """
 
-from flask import Flask, request, jsonify, Blueprint, render_template, abort, make_response, redirect
+from flask import Flask, request, jsonify, Blueprint, render_template, abort, make_response
 from flask_cors import CORS
-import psycopg2
 from psycopg2 import pool as pg_pool
 from psycopg2.extras import RealDictCursor
 import bcrypt
