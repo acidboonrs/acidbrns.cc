@@ -1,5 +1,7 @@
 # Architecture & Security Design
 
+🌐 **English** · [Deutsch](ARCHITECTURE.de.md)
+
 Self-hosted XMPP account provisioning for **acidbrns.cc**. Users self-register
 through a web form; the backend provisions each account atomically in PostgreSQL
 **and** the Prosody XMPP server. The system is built privacy- and security-first.

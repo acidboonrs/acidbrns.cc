@@ -4,7 +4,7 @@ Komplettes System zur Erstellung und Verwaltung von XMPP-Accounts mit moderner W
 
 **✨ Speziell konfiguriert für: acidbrns.cc mit Cloudflare DNS**
 
-> 🏛️ **Architektur & Security-Design:** siehe [ARCHITECTURE.md](ARCHITECTURE.md)
+> 🏛️ **Architektur & Security-Design:** [English](ARCHITECTURE.md) · [Deutsch](ARCHITECTURE.de.md)
 > — Defense-in-Depth, Edge-Proxy + verschlüsselter Tunnel, self-hosted Bot-Schutz,
 > JavaScript-freies, datenschutzfokussiertes Design.
 

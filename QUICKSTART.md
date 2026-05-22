@@ -141,7 +141,7 @@ sudo tail -f /var/log/prosody/prosody.log
 
 ## 📚 Mehr Hilfe
 
-- **ARCHITECTURE.md** - Architektur & Security-Design (Überblick)
+- **ARCHITECTURE.md** / **ARCHITECTURE.de.md** - Architektur & Security-Design (EN/DE)
 - **CLOUDFLARE_SETUP.md** - Detaillierte Cloudflare-Anleitung
 - **README.md** - Komplettes Handbuch
 - **DATABASE_GUIDE.md** - Datenbank für Anfänger
